@@ -1,2 +1,3 @@
-# tankGame
-tank battle game, wip
+# tank game
+
+WORK IN PROCESS
