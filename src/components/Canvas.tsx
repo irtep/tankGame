@@ -20,7 +20,7 @@ const Canvas: React.FC = () => {
       x: canvas.width / 2,
       y: canvas.height / 2,
       width: 40,
-      height: 60,
+      height: 20,
       angle: 0,
       speed: 3,
     };
@@ -30,10 +30,17 @@ const Canvas: React.FC = () => {
       x: canvas.width / 4,
       y: canvas.height / 4,
       width: 40,
-      height: 60,
+      height: 20,
       angle: 0,
-      speed: 2,
+      speed: 3,
     };
+
+    // hits
+    interface Hit {
+      x: number;
+      y: number;
+    };
+    const hits: Hit[] = [];
 
     // Obstacles
     const obstacles = [
@@ -84,7 +91,7 @@ const Canvas: React.FC = () => {
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousedown', handleMouseDown);
 
-    const randomAngle = () => Math.random() * Math.PI * 2;
+    //const randomAngle = () => Math.random() * Math.PI * 2;
 
     // Function for detecting collision between two rectangles
     const isRectColliding = (rect1: { x: number; y: number; width: number; height: number }, rect2: { x: number; y: number; width: number; height: number }) => {
@@ -230,6 +237,8 @@ const Canvas: React.FC = () => {
             { x: tank.x - tank.width / 2, y: tank.y - tank.height / 2, width: tank.width, height: tank.height }
           )
         ) {
+          hits.push({x: bullet.x - 2.5, y: bullet.y - 2.5});
+          if (hits.length > 10) { hits.shift(); }
           setMessage('AI Wins!');
           return false;
         }
@@ -242,6 +251,8 @@ const Canvas: React.FC = () => {
             { x: aiTank.x - aiTank.width / 2, y: aiTank.y - aiTank.height / 2, width: aiTank.width, height: aiTank.height }
           )
         ) {
+          hits.push({x: bullet.x - 2.5, y: bullet.y - 2.5});
+          if (hits.length > 10) { hits.shift(); }
           setMessage('Player Wins!');
           return false;
         }
@@ -294,6 +305,14 @@ const Canvas: React.FC = () => {
         ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
         ctx.fill();
       });
+
+      // Draw hits:
+      ctx.fillStyle = 'darkred';
+      hits.forEach((hit: Hit) => {
+        ctx.beginPath();
+        ctx.arc(hit.x, hit.y, 5, 0, Math.PI * 2);
+        ctx.fill();
+      });
     };
 
     const loop = () => {
@@ -316,7 +335,16 @@ const Canvas: React.FC = () => {
       <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
         {message}
       </div>
-      <canvas ref={canvasRef}></canvas>
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          border: '1px solid black',
+          background: "#9A7B4D",
+          marginLeft: 0,
+          marginRight: 0
+        }}>
+      </canvas>
     </div>
   );
 };
