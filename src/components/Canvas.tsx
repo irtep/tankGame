@@ -3,13 +3,15 @@ import React, { useEffect, useRef, useState } from 'react';
 const Canvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
+  const arenaWidth: number = 800;
+  const arenaHeight: number = 600;
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = arenaWidth;
+    canvas.height = arenaHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
@@ -35,13 +37,18 @@ const Canvas: React.FC = () => {
 
     // Obstacles
     const obstacles = [
-      { x: 200, y: 200, width: 100, height: 50 },
-      { x: 500, y: 400, width: 150, height: 50 },
+      { x: 200, y: 250, width: 100, height: 50 },
+      { x: 560, y: 400, width: 150, height: 50 },
+      // outer walls
+      { x: 0, y: 0, width: arenaWidth, height: 5 },
+      { x: 0, y: arenaHeight - 10, width: arenaWidth, height: 5 },
+      { x: 0, y: 0, width: 5, height: arenaHeight },
+      { x: arenaWidth - 10, y: 0, width: 5, height: arenaHeight },
     ];
 
     // Bullet properties
     const bullets: { x: number; y: number; angle: number; owner: 'player' | 'ai' }[] = [];
-    const bulletSpeed = 5;
+    const bulletSpeed = 10;
 
     // Keyboard state
     const keys: { [key: string]: boolean } = {
@@ -82,9 +89,9 @@ const Canvas: React.FC = () => {
     // Function for detecting collision between two rectangles
     const isRectColliding = (rect1: { x: number; y: number; width: number; height: number }, rect2: { x: number; y: number; width: number; height: number }) => {
       return rect1.x < rect2.x + rect2.width &&
-             rect1.x + rect1.width > rect2.x &&
-             rect1.y < rect2.y + rect2.height &&
-             rect1.y + rect1.height > rect2.y;
+        rect1.x + rect1.width > rect2.x &&
+        rect1.y < rect2.y + rect2.height &&
+        rect1.y + rect1.height > rect2.y;
     };
 
     const isRotatedRectColliding = (
@@ -306,8 +313,10 @@ const Canvas: React.FC = () => {
 
   return (
     <div>
+      <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
+        {message}
+      </div>
       <canvas ref={canvasRef}></canvas>
-      <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>{message}</div>
     </div>
   );
 };
