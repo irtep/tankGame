@@ -1,10 +1,36 @@
 import React, { useEffect, useRef, useState } from 'react';
+import draw from '../functions/draw';
+import { arenaHeight, arenaWidth, bulletSpeed } from '../constants/measures';
+import { obstacles } from '../constants/obstacles';
+import { bullets } from '../constants/bullets';
+import { Hit, Obstacle, Vehicle } from '../interfaces/sharedInterfaces';
 
 const Canvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
-  const arenaWidth: number = 800;
-  const arenaHeight: number = 600;
+
+  let tank: Vehicle = {
+    name: 'test tank',
+    x: 800 / 2,
+    y: 600 / 2,
+    width: 40,
+    height: 20,
+    angle: 0,
+    speed: 3,
+    hitPoints: 9
+  };
+
+  // AI Tank properties
+  let aiTank: Vehicle = {
+    name: 'ai tank',
+    x: 800 / 4,
+    y: 600 / 4,
+    width: 40,
+    height: 20,
+    angle: 0,
+    speed: 3,
+    hitPoints: 9
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -15,47 +41,7 @@ const Canvas: React.FC = () => {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    // Tank properties
-    let tank = {
-      x: canvas.width / 2,
-      y: canvas.height / 2,
-      width: 40,
-      height: 20,
-      angle: 0,
-      speed: 3,
-    };
-
-    // AI Tank properties
-    let aiTank = {
-      x: canvas.width / 4,
-      y: canvas.height / 4,
-      width: 40,
-      height: 20,
-      angle: 0,
-      speed: 3,
-    };
-
-    // hits
-    interface Hit {
-      x: number;
-      y: number;
-    };
     const hits: Hit[] = [];
-
-    // Obstacles
-    const obstacles = [
-      { x: 200, y: 250, width: 100, height: 50 },
-      { x: 560, y: 400, width: 150, height: 50 },
-      // outer walls
-      { x: 0, y: 0, width: arenaWidth, height: 5 },
-      { x: 0, y: arenaHeight - 10, width: arenaWidth, height: 5 },
-      { x: 0, y: 0, width: 5, height: arenaHeight },
-      { x: arenaWidth - 10, y: 0, width: 5, height: arenaHeight },
-    ];
-
-    // Bullet properties
-    const bullets: { x: number; y: number; angle: number; owner: 'player' | 'ai' }[] = [];
-    const bulletSpeed = 10;
 
     // Keyboard state
     const keys: { [key: string]: boolean } = {
@@ -163,12 +149,17 @@ const Canvas: React.FC = () => {
       };
 
       if (
-        !obstacles.some((obstacle) =>
+        !obstacles.some((obstacle: Obstacle) =>
           isRotatedRectColliding(nextTank, { x: obstacle.x + obstacle.width / 2, y: obstacle.y + obstacle.height / 2, width: obstacle.width, height: obstacle.height, angle: 0 })
         ) &&
         !isRotatedRectColliding(nextTank, aiTank)
       ) {
-        tank = { ...nextTank, speed: tank.speed }; // Immutable update
+        tank = {
+          ...nextTank,
+          name: tank.name,
+          speed: tank.speed,
+          hitPoints: tank.hitPoints
+        }; // Immutable update
       }
 
       // Check AI tank collision with obstacles
@@ -186,7 +177,12 @@ const Canvas: React.FC = () => {
         ) &&
         !isRotatedRectColliding(nextAiTank, tank)
       ) {
-        aiTank = { ...nextAiTank, speed: aiTank.speed }; // Immutable update, preserving the speed
+        aiTank = {
+          ...nextAiTank,
+          name: aiTank.name,
+          speed: aiTank.speed,
+          hitPoints: aiTank.hitPoints
+        }; // Immutable update, preserving the speed
       }
 
       // Update AI random movement angle
@@ -237,8 +233,9 @@ const Canvas: React.FC = () => {
             { x: tank.x - tank.width / 2, y: tank.y - tank.height / 2, width: tank.width, height: tank.height }
           )
         ) {
-          hits.push({x: bullet.x - 2.5, y: bullet.y - 2.5});
+          hits.push({ x: bullet.x - 2.5, y: bullet.y - 2.5 });
           if (hits.length > 10) { hits.shift(); }
+          tank = { ...tank, hitPoints: tank.hitPoints -1 };
           setMessage('AI Wins!');
           return false;
         }
@@ -251,9 +248,10 @@ const Canvas: React.FC = () => {
             { x: aiTank.x - aiTank.width / 2, y: aiTank.y - aiTank.height / 2, width: aiTank.width, height: aiTank.height }
           )
         ) {
-          hits.push({x: bullet.x - 2.5, y: bullet.y - 2.5});
+          hits.push({ x: bullet.x - 2.5, y: bullet.y - 2.5 });
           if (hits.length > 10) { hits.shift(); }
           setMessage('Player Wins!');
+          aiTank = { ...aiTank, hitPoints: aiTank.hitPoints -1 };
           return false;
         }
 
@@ -272,52 +270,16 @@ const Canvas: React.FC = () => {
       bullets.push(...updatedBullets); // Update with the remaining bullets
     };
 
-    const draw = () => {
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw player tank
-      ctx.save();
-      ctx.translate(tank.x, tank.y);
-      ctx.rotate(tank.angle);
-      ctx.fillStyle = 'green';
-      ctx.fillRect(-tank.width / 2, -tank.height / 2, tank.width, tank.height);
-      ctx.restore();
-
-      // Draw AI tank
-      ctx.save();
-      ctx.translate(aiTank.x, aiTank.y);
-      ctx.rotate(aiTank.angle);
-      ctx.fillStyle = 'blue';
-      ctx.fillRect(-aiTank.width / 2, -aiTank.height / 2, aiTank.width, aiTank.height);
-      ctx.restore();
-
-      // Draw obstacles
-      ctx.fillStyle = 'gray';
-      obstacles.forEach((obstacle) => {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
-      });
-
-      // Draw bullets
-      ctx.fillStyle = 'red';
-      bullets.forEach((bullet) => {
-        ctx.beginPath();
-        ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-
-      // Draw hits:
-      ctx.fillStyle = 'darkred';
-      hits.forEach((hit: Hit) => {
-        ctx.beginPath();
-        ctx.arc(hit.x, hit.y, 5, 0, Math.PI * 2);
-        ctx.fill();
-      });
-    };
-
     const loop = () => {
+      if (tank.hitPoints <= 0 || aiTank.hitPoints <= 0) {
+        // Stop the loop and display a message
+        if (tank.hitPoints <= 0) setMessage('AI Wins!');
+        if (aiTank.hitPoints <= 0) setMessage('Player Wins!');
+        return; // Exit the loop
+      }
+
       update();
-      draw();
+      draw(ctx, canvas, tank, aiTank, hits);
       requestAnimationFrame(loop);
     };
 
@@ -333,7 +295,7 @@ const Canvas: React.FC = () => {
   return (
     <div>
       <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
-        {message}
+        {message} player hp: {tank.hitPoints} ai hp: {aiTank.hitPoints}
       </div>
       <canvas
         ref={canvasRef}
