@@ -4,7 +4,9 @@ import Canvas from './components/Canvas';
 import { Container } from '@mui/material';
 
 const App: React.FC = (): React.ReactElement => {
-  const [view, setView] = useState< 'menu' | 'canvas' | 'afterBattle'>('menu'); 
+  const [view, setView] = useState< 'menu' | 'battle' | 'preBattle' | 'afterBattle'>('menu'); 
+  const [playerRig, setPlayerRig] = useState<string>('Amazonas');
+  const [opponentRig, setOpponentRig] = useState<string>('Bullterrier');
 
   return (
     <Container>
@@ -13,13 +15,26 @@ const App: React.FC = (): React.ReactElement => {
         <>
           <Menu 
             setView={setView}
+            playerRig={playerRig}
+            opponentRig={opponentRig}
+            setPlayerRig={setPlayerRig}
+            setOpponentRig={setOpponentRig}
           />
         </> : <></>
       }
       {
-        (view === 'canvas') ?
+        (
+          view === 'battle' ||
+          view === 'preBattle' ||
+          view === 'afterBattle'
+        ) ?
         <>
-          <Canvas />
+          <Canvas 
+            setView={setView}
+            view={view}
+            playerRig={playerRig}
+            opponentRig={opponentRig}
+          />
         </> : <></>
       }
     </Container>

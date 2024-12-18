@@ -19,4 +19,7 @@ export interface Vehicle {
     angle: number;
     speed: number;
     hitPoints: number;
+    desc?: string;
+    battleImg?: string;
+    descImg?: string;
 };

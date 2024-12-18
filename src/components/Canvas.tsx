@@ -4,11 +4,25 @@ import { arenaHeight, arenaWidth, bulletSpeed } from '../constants/measures';
 import { obstacles } from '../constants/obstacles';
 import { bullets } from '../constants/bullets';
 import { Hit, Obstacle, Vehicle } from '../interfaces/sharedInterfaces';
+import { getRigByName } from '../functions/utils';
+import { Battery20Outlined } from '@mui/icons-material';
 
-const Canvas: React.FC = () => {
+interface CanvasProps {
+  setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
+  view: 'menu' | 'battle' | 'preBattle' | 'afterBattle';
+  playerRig: string;
+  opponentRig: string;
+}
+
+const Canvas: React.FC<CanvasProps> = ({
+  setView,
+  view,
+  playerRig,
+  opponentRig
+}) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
-
+/*
   let tank: Vehicle = {
     name: 'test tank',
     x: 800 / 2,
@@ -31,7 +45,7 @@ const Canvas: React.FC = () => {
     speed: 3,
     hitPoints: 9
   };
-
+*/
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -40,6 +54,41 @@ const Canvas: React.FC = () => {
     canvas.height = arenaHeight;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    // player rig place holder
+    let tank: Vehicle = {
+      name: 'test tank',
+      x: 800 / 2,
+      y: 600 / 2,
+      width: 40,
+      height: 20,
+      angle: 0,
+      speed: 3,
+      hitPoints: 9
+    };
+  
+    // AI rig place holder
+    let aiTank: Vehicle = {
+      name: 'ai tank',
+      x: 800 / 4,
+      y: 600 / 4,
+      width: 40,
+      height: 20,
+      angle: 0,
+      speed: 3,
+      hitPoints: 9
+    };
+
+    const pRig = getRigByName(playerRig);
+    const oRig = getRigByName(opponentRig);
+    if (pRig && oRig) {
+      tank = pRig;
+      tank.x = 150;
+      tank.y = 150;
+      aiTank = oRig;
+      aiTank.x = 600;
+      aiTank.y = 500;
+    }
 
     const hits: Hit[] = [];
 
@@ -158,7 +207,8 @@ const Canvas: React.FC = () => {
           ...nextTank,
           name: tank.name,
           speed: tank.speed,
-          hitPoints: tank.hitPoints
+          hitPoints: tank.hitPoints,
+          battleImg: tank.battleImg
         }; // Immutable update
       }
 
@@ -169,6 +219,7 @@ const Canvas: React.FC = () => {
         width: aiTank.width,
         height: aiTank.height,
         angle: aiTank.angle,
+        battleImg: aiTank.battleImg
       };
 
       if (
@@ -182,7 +233,7 @@ const Canvas: React.FC = () => {
           name: aiTank.name,
           speed: aiTank.speed,
           hitPoints: aiTank.hitPoints
-        }; // Immutable update, preserving the speed
+        }; // Immutable update
       }
 
       // Update AI random movement angle
@@ -235,7 +286,7 @@ const Canvas: React.FC = () => {
         ) {
           hits.push({ x: bullet.x - 2.5, y: bullet.y - 2.5 });
           if (hits.length > 10) { hits.shift(); }
-          tank = { ...tank, hitPoints: tank.hitPoints -1 };
+          tank = { ...tank, hitPoints: tank.hitPoints - 1 };
           setMessage('AI Wins!');
           return false;
         }
@@ -251,7 +302,7 @@ const Canvas: React.FC = () => {
           hits.push({ x: bullet.x - 2.5, y: bullet.y - 2.5 });
           if (hits.length > 10) { hits.shift(); }
           setMessage('Player Wins!');
-          aiTank = { ...aiTank, hitPoints: aiTank.hitPoints -1 };
+          aiTank = { ...aiTank, hitPoints: aiTank.hitPoints - 1 };
           return false;
         }
 
@@ -275,28 +326,76 @@ const Canvas: React.FC = () => {
         // Stop the loop and display a message
         if (tank.hitPoints <= 0) setMessage('AI Wins!');
         if (aiTank.hitPoints <= 0) setMessage('Player Wins!');
+        setView('afterBattle');
         return; // Exit the loop
       }
 
       update();
-      draw(ctx, canvas, tank, aiTank, hits);
+      draw(ctx, canvas, [tank, aiTank], hits);
       requestAnimationFrame(loop);
     };
 
-    loop();
+    if (view === 'battle') {
+      loop();
+    }
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('keyup', handleKeyUp);
       canvas.removeEventListener('mousedown', handleMouseDown);
     };
-  }, []);
+  }, [view]);
+/*
+  useEffect(() => {
+    const pRig = getRigByName(playerRig);
+    const oRig = getRigByName(opponentRig);
+    if (pRig && oRig) {
+      tank = pRig;
+      aiTank = oRig
+    }
+  }, [playerRig, opponentRig]);
+*/
 
   return (
     <div>
+
       <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
-        {message} player hp: {tank.hitPoints} ai hp: {aiTank.hitPoints}
+        {
+          (view === 'preBattle') ?
+            <>
+              <button
+                onClick={() => {
+                  setView('battle')
+                }}
+              >
+                Click this to start the battle
+              </button>
+            </> :
+            <></>
+        }
+        {
+          (view === 'afterBattle') ?
+            <>
+              {message}
+              <button
+                onClick={() => {
+                  setView('battle')
+                }}
+              >
+                Play again
+              </button>
+              <button
+                onClick={() => {
+                  setView('menu')
+                }}
+              >
+                Back to menu
+              </button>
+            </> :
+            <></>
+        }
       </div>
+
       <canvas
         ref={canvasRef}
         style={{
@@ -307,6 +406,7 @@ const Canvas: React.FC = () => {
           marginRight: 0
         }}>
       </canvas>
+
     </div>
   );
 };

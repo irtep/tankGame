@@ -1,11 +1,27 @@
-import React from 'react';
-import { Box, Button } from '@mui/material';
+import React, { useState } from 'react';
+import { Box, Button, MenuItem, Select } from '@mui/material';
+import { Vehicle } from '../interfaces/sharedInterfaces';
+import { rigs } from '../constants/rigs';
+import { getRigByName } from '../functions/utils';
 
 interface MenuProps {
-  setView: any;
+  setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
+  playerRig: string;
+  opponentRig: string;
+  setPlayerRig: React.Dispatch<React.SetStateAction<string>>;
+  setOpponentRig: React.Dispatch<React.SetStateAction<string>>;
 };
 
-const Menu: React.FC<MenuProps> = ({ setView }) => {
+const Menu: React.FC<MenuProps> = ({
+    setView, 
+    playerRig,
+    opponentRig,
+    setPlayerRig,
+    setOpponentRig
+  }) => {
+    
+  const pRig = getRigByName(playerRig);
+  const oRig = getRigByName(opponentRig);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, p: 3 }}>
@@ -18,39 +34,69 @@ const Menu: React.FC<MenuProps> = ({ setView }) => {
           gap: 2,
         }}
       >
+        <h3>Select Your Rig</h3>
+        <Select
+          value={playerRig}
+          onChange={(e) => setPlayerRig(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          {rigs.map((rig: Vehicle, i: number) => (
+            <MenuItem key={`pRig ${i}`} value={rig.name}>
+              {rig.name}
+            </MenuItem>
+          ))}
+        </Select>
 
+        <h3>Select Opponents Rig</h3>
+        <Select
+          value={opponentRig}
+          onChange={(e) => setOpponentRig(e.target.value)}
+          sx={{ mb: 2 }}
+        >
+          {rigs.map((rig: Vehicle, i: number) => (
+            <MenuItem key={`oRig ${i}`} value={rig.name}>
+              {rig.name}
+            </MenuItem>
+          ))}
+        </Select>
         <Button
           onClick={() => {
-            setView('canvas');
+            setView('preBattle');
           }}
-        >race</Button>
+        >Play</Button>
       </Box>
 
-      {/* Right Column: Lap Records */}
+      {/* Right Column: Selected rigs */}
       <Box
         sx={{
           flex: 1,
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
-          gridTemplateRows: '1fr 1fr',
+          gridTemplateColumns: '1fr',
+          gridTemplateRows: '1fr',
           gap: 2,
         }}
       >
         <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>Track 1</h4>
-          {/* Placeholder for Track 1 lap records */}
+          <h4>{playerRig}</h4>
+          <p>{pRig?.desc}</p>
+          {pRig?.descImg && (
+            <img
+              src={`/img/${pRig?.descImg}`}
+              alt={`${pRig.name} description`}
+              style={{ maxWidth: '200px' }}
+            />
+          )}
         </Box>
         <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>Track 2</h4>
-          {/* Placeholder for Track 2 lap records */}
-        </Box>
-        <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>Track 3</h4>
-          {/* Placeholder for Track 3 lap records */}
-        </Box>
-        <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>Track 4</h4>
-          {/* Placeholder for Track 4 lap records */}
+          <h4>{opponentRig}</h4>
+          <p>{oRig?.desc}</p>
+          {oRig?.descImg && (
+            <img
+              src={`/img/${oRig?.descImg}`}
+              alt={`${oRig.name} description`}
+              style={{ maxWidth: '200px' }}
+            />
+          )}
         </Box>
       </Box>
     </Box>
