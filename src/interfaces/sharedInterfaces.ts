@@ -22,4 +22,32 @@ export interface Vehicle {
     desc?: string;
     battleImg?: string;
     descImg?: string;
+    turretGun?: string; // fires from back center
+    leftSideGun?: string; // fires from side, quite front
+    rightSideGun?: string; // fires from side, quite front
+    leftBackGun?: string; // fires from side, quite back
+    rightBackGun?: string; // fires from side, quite back
+};
+
+export interface Bullet {
+    x: number;
+    y: number;
+    angle: number;
+    owner: 'player' | 'ai';
+    color: string;
+    damage: number;
+};
+
+export interface Weapon {
+    name: string;
+    type: string;
+    color: string;
+    bulletSize: number;
+    turret: boolean;
+    damage: number;
+    impactPower: number;
+    cooldown: number;
+    specials: string[];
+    cost: number;
+    speed: number;
 };

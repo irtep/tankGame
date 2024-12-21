@@ -1,7 +1,3 @@
+import { Bullet } from "../interfaces/sharedInterfaces";
 
-export const bullets: { 
-    x: number; 
-    y: number; 
-    angle: number; 
-    owner: 'player' | 'ai' 
-}[] = [];
+export const bullets: Bullet[] = [];

@@ -12,7 +12,10 @@ export const rigs: Vehicle[] = [
         hitPoints: 9,
         desc: 'Heavily armed hotrod offers good movement and good firepower with accelerator, microbeams and micro missile pods',
         battleImg: 'bullterrier_battle.png',
-        descImg: 'bullterrier_desc.jpg'
+        descImg: 'bullterrier_desc.jpg',
+        turretGun: 'accelerator',
+        leftSideGun: 'microbeam',
+        rightSideGun: 'microbeam'
     },
     {
         name: 'Amazonas',
@@ -25,7 +28,12 @@ export const rigs: Vehicle[] = [
         hitPoints: 9,
         desc: 'Amazonas is designed for fighting close distance with deadly vanguard and slam ram',
         battleImg: 'amazonas_battle.png',
-        descImg: 'amazonas_desc.jpg'
+        descImg: 'amazonas_desc.jpg',
+        turretGun: 'vanguard',
+        leftSideGun: 'microbeam',
+        rightSideGun: 'microbeam',
+        leftBackGun: 'micro rocket pod',
+        rightBackGun: 'micro rocket pod',
     },
     {
         name: 'Leprechaun',
@@ -38,7 +46,10 @@ export const rigs: Vehicle[] = [
         hitPoints: 9,
         desc: 'This All-terrain roller terrorizes opponents with rapid bursts of its rattler.',
         battleImg: 'leprechaun_battle.png',
-        descImg: 'leprechaun_desc.jpg'
+        descImg: 'leprechaun_desc.jpg',
+        turretGun: 'rattler',
+        leftSideGun: 'micro rocket pod',
+        rightSideGun: 'micro rocket pod',
     },
     {
         name: 'Ice',
@@ -51,7 +62,10 @@ export const rigs: Vehicle[] = [
         hitPoints: 9,
         desc: 'Desert spear Ice is for friends of fast speeds and long ranged missiles',
         battleImg: 'ice_battle.png',
-        descImg: 'ice_desc.jpg'
+        descImg: 'ice_desc.jpg',
+        turretGun: 'shreik missiles',
+        leftSideGun: 'microbeam',
+        rightSideGun: 'microbeam',
     },
     {
         name: 'Starblade',
@@ -64,6 +78,9 @@ export const rigs: Vehicle[] = [
         hitPoints: 9,
         desc: 'If you like huge cannons and vengeances... Starblade with vengeance cannon is what you need.',
         battleImg: 'starblade_battle.png',
-        descImg: 'starblade_desc.jpg'
+        descImg: 'starblade_desc.jpg',
+        turretGun: 'vengeance cannon',
+        leftSideGun: 'blaster',
+        rightSideGun: 'blaster',
     }
 ];

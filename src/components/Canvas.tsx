@@ -5,7 +5,6 @@ import { obstacles } from '../constants/obstacles';
 import { bullets } from '../constants/bullets';
 import { Hit, Obstacle, Vehicle } from '../interfaces/sharedInterfaces';
 import { getRigByName } from '../functions/utils';
-import { Battery20Outlined } from '@mui/icons-material';
 
 interface CanvasProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -22,30 +21,7 @@ const Canvas: React.FC<CanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
-/*
-  let tank: Vehicle = {
-    name: 'test tank',
-    x: 800 / 2,
-    y: 600 / 2,
-    width: 40,
-    height: 20,
-    angle: 0,
-    speed: 3,
-    hitPoints: 9
-  };
 
-  // AI Tank properties
-  let aiTank: Vehicle = {
-    name: 'ai tank',
-    x: 800 / 4,
-    y: 600 / 4,
-    width: 40,
-    height: 20,
-    angle: 0,
-    speed: 3,
-    hitPoints: 9
-  };
-*/
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -79,15 +55,16 @@ const Canvas: React.FC<CanvasProps> = ({
       hitPoints: 9
     };
 
+    // updates tank objects to match selected rigs
     const pRig = getRigByName(playerRig);
     const oRig = getRigByName(opponentRig);
     if (pRig && oRig) {
       tank = pRig;
-      tank.x = 150;
-      tank.y = 150;
+      tank.x = 600;
+      tank.y = 500;
       aiTank = oRig;
-      aiTank.x = 600;
-      aiTank.y = 500;
+      aiTank.x = 150;
+      aiTank.y = 150;
     }
 
     const hits: Hit[] = [];
@@ -119,14 +96,14 @@ const Canvas: React.FC<CanvasProps> = ({
         y: tank.y,
         angle,
         owner: 'player',
+        color: 'red',
+        damage: 1
       });
     };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousedown', handleMouseDown);
-
-    //const randomAngle = () => Math.random() * Math.PI * 2;
 
     // Function for detecting collision between two rectangles
     const isRectColliding = (rect1: { x: number; y: number; width: number; height: number }, rect2: { x: number; y: number; width: number; height: number }) => {
@@ -259,6 +236,8 @@ const Canvas: React.FC<CanvasProps> = ({
           y: aiTank.y,
           angle,
           owner: 'ai',
+          color: 'black',
+          damage: 1
         });
       }
 
