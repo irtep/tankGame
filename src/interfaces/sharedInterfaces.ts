@@ -1,6 +1,7 @@
 export interface Obstacle {
     x: number;
     y: number;
+    angle: number;
     width: number;
     height: number;
 };
@@ -8,6 +9,14 @@ export interface Obstacle {
 export interface Hit {
     x: number;
     y: number;
+};
+
+export interface WeaponArray {
+    turretGun?: string; // fires from back center
+    leftSideGun?: string; // fires from side, quite front
+    rightSideGun?: string; // fires from side, quite front
+    leftBackGun?: string; // fires from side, quite back
+    rightBackGun?: string; // fires from side, quite back
 };
 
 export interface Vehicle {
@@ -22,12 +31,14 @@ export interface Vehicle {
     desc?: string;
     battleImg?: string;
     descImg?: string;
-    turretGun?: string; // fires from back center
-    leftSideGun?: string; // fires from side, quite front
-    rightSideGun?: string; // fires from side, quite front
-    leftBackGun?: string; // fires from side, quite back
-    rightBackGun?: string; // fires from side, quite back
+    reloadStatus?: number;
+    weapons: WeaponArray;
 };
+
+export interface VehicleWithRole {
+    vehicle: Vehicle;
+    role: 'player' | 'ai';
+}
 
 export interface Bullet {
     x: number;
@@ -49,5 +60,6 @@ export interface Weapon {
     cooldown: number;
     specials: string[];
     cost: number;
+    costInSpeed: number;
     speed: number;
 };

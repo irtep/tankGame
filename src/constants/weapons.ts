@@ -12,7 +12,8 @@ export const weapons: Weapon[] = [
         cooldown: 0.5,
         specials: ['suppressing'],
         cost: 1,
-        speed: 4
+        costInSpeed: 4,
+        speed: 10
     },
     {
         name: 'vengeance cannon',
@@ -25,7 +26,8 @@ export const weapons: Weapon[] = [
         cooldown: 5,
         specials: ['detonate 5'],
         cost: 2,
-        speed: 1
+        costInSpeed: 1,
+        speed: 10
     },
     {
         name: 'shreik missiles',
@@ -38,7 +40,8 @@ export const weapons: Weapon[] = [
         cooldown: 5,
         specials: ['homing'],
         cost: 2,
-        speed: 1
+        costInSpeed: 1,
+        speed: 10
     },
     {
         name: 'vanguard',
@@ -51,7 +54,8 @@ export const weapons: Weapon[] = [
         cooldown: 1,
         specials: ['point blank'],
         cost: 1,
-        speed: 1
+        costInSpeed: 1,
+        speed: 10
     },
     {
         name: 'accelerator',
@@ -64,7 +68,8 @@ export const weapons: Weapon[] = [
         cooldown: 1,
         specials: ['ignores fields'],
         cost: 1,
-        speed: 1
+        costInSpeed: 1,
+        speed: 10
     },
     {
         name: 'micro rocket pod',
@@ -77,7 +82,8 @@ export const weapons: Weapon[] = [
         cooldown: 1,
         specials: ['light'],
         cost: 0,
-        speed: 0
+        costInSpeed: 0,
+        speed: 10
     },
     {
         name: 'microbeam',
@@ -90,7 +96,8 @@ export const weapons: Weapon[] = [
         cooldown: 1,
         specials: ['light'],
         cost: 0,
-        speed: 0
+        costInSpeed: 0,
+        speed: 10
     },
     {
         name: 'blaster',
@@ -103,6 +110,7 @@ export const weapons: Weapon[] = [
         cooldown: 0.5,
         specials: ['light'],
         cost: 0,
-        speed: 0
+        costInSpeed: 0,
+        speed: 10
     }
 ];
