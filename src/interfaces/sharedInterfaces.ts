@@ -11,22 +11,32 @@ export interface Hit {
     y: number;
 };
 
+export interface ArmedWeapon {
+    name: string;
+    cooldown: number;
+}
+
 export interface WeaponArray {
-    turretGun?: string; // fires from back center
-    leftSideGun?: string; // fires from side, quite front
-    rightSideGun?: string; // fires from side, quite front
-    leftBackGun?: string; // fires from side, quite back
-    rightBackGun?: string; // fires from side, quite back
+    turretGun?: ArmedWeapon; // fires from back center
+    leftSideGun?: ArmedWeapon; // fires from side, quite front
+    rightSideGun?: ArmedWeapon; // fires from side, quite front
+    leftBackGun?: ArmedWeapon; // fires from side, quite back
+    rightBackGun?: ArmedWeapon; // fires from side, quite back
 };
 
 export interface Vehicle {
     name: string;
+    type: string;
     x: number;
     y: number;
     width: number;
     height: number;
     angle: number;
     speed: number;
+    acceleration: number;
+    armour: number;
+    velocityX: number;
+    velocityY: number;
     hitPoints: number;
     desc?: string;
     battleImg?: string;
@@ -47,6 +57,15 @@ export interface Bullet {
     owner: 'player' | 'ai';
     color: string;
     damage: number;
+    size: number;
+    specials?: string[];
+    speed: number;
+};
+
+export interface Coordinates {
+    x: number;
+    y: number;
+    angle: number;
 };
 
 export interface Weapon {

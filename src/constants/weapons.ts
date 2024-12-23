@@ -4,7 +4,7 @@ export const weapons: Weapon[] = [
     {
         name: 'rattler',
         type: 'shell',
-        color: 'red',
+        color: 'darkred',
         bulletSize: 2,
         turret: true,
         damage: 0.2,
@@ -13,13 +13,13 @@ export const weapons: Weapon[] = [
         specials: ['suppressing'],
         cost: 1,
         costInSpeed: 4,
-        speed: 10
+        speed: 15
     },
     {
         name: 'vengeance cannon',
         type: 'shell',
         color: 'black',
-        bulletSize: 10,
+        bulletSize: 3,
         turret: true,
         damage: 3,
         impactPower: 6,
@@ -27,13 +27,13 @@ export const weapons: Weapon[] = [
         specials: ['detonate 5'],
         cost: 2,
         costInSpeed: 1,
-        speed: 10
+        speed: 15
     },
     {
         name: 'shreik missiles',
         type: 'missile',
         color: 'white',
-        bulletSize: 10,
+        bulletSize: 3,
         turret: true,
         damage: 3,
         impactPower: 6,
@@ -41,13 +41,13 @@ export const weapons: Weapon[] = [
         specials: ['homing'],
         cost: 2,
         costInSpeed: 1,
-        speed: 10
+        speed: 12
     },
     {
         name: 'vanguard',
         type: 'shell',
         color: 'black',
-        bulletSize: 5,
+        bulletSize: 2,
         turret: true,
         damage: 1,
         impactPower: 4,
@@ -55,21 +55,21 @@ export const weapons: Weapon[] = [
         specials: ['point blank'],
         cost: 1,
         costInSpeed: 1,
-        speed: 10
+        speed: 15
     },
     {
         name: 'accelerator',
         type: 'shell',
         color: 'black',
-        bulletSize: 5,
+        bulletSize: 2,
         turret: true,
         damage: 1,
         impactPower: 4,
-        cooldown: 1,
-        specials: ['ignores fields'],
+        cooldown: 2,
+        specials: ['shield piercing'],
         cost: 1,
         costInSpeed: 1,
-        speed: 10
+        speed: 16
     },
     {
         name: 'micro rocket pod',
@@ -77,13 +77,13 @@ export const weapons: Weapon[] = [
         color: 'white',
         bulletSize: 1,
         turret: false,
-        damage: 0,
+        damage: 0.2,
         impactPower: 3,
         cooldown: 1,
         specials: ['light'],
         cost: 0,
         costInSpeed: 0,
-        speed: 10
+        speed: 12
     },
     {
         name: 'microbeam',
@@ -91,13 +91,13 @@ export const weapons: Weapon[] = [
         color: 'cyan',
         bulletSize: 1,
         turret: false,
-        damage: 0,
+        damage: 0.2,
         impactPower: 3,
         cooldown: 1,
         specials: ['light'],
         cost: 0,
         costInSpeed: 0,
-        speed: 10
+        speed: 12
     },
     {
         name: 'blaster',
@@ -105,12 +105,12 @@ export const weapons: Weapon[] = [
         color: 'black',
         bulletSize: 1,
         turret: false,
-        damage: 0,
+        damage: 0.2,
         impactPower: 3,
         cooldown: 0.5,
         specials: ['light'],
         cost: 0,
         costInSpeed: 0,
-        speed: 10
+        speed: 12
     }
 ];

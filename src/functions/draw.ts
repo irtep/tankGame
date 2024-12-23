@@ -1,5 +1,4 @@
-import { Vehicle } from "../interfaces/sharedInterfaces";
-import { bullets } from "../constants/bullets";
+import { Bullet, Vehicle } from "../interfaces/sharedInterfaces";
 import { obstacles } from "../constants/obstacles";
 import { Hit } from "../interfaces/sharedInterfaces";
 
@@ -36,14 +35,15 @@ const drawExplosion = (ctx: CanvasRenderingContext2D, x: number, y: number, radi
 const draw = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
-    tanks: Vehicle[],
-    hits: Hit[]
+    rigs: Vehicle[],
+    hits: Hit[],
+    bullets: Bullet[]
 ) => {
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    tanks.forEach( (tank: Vehicle) => {
+    rigs.forEach( (tank: Vehicle) => {
         const imgKey = tank.battleImg;
         if (imgKey) {
             // Check if the image is already in the cache
@@ -108,10 +108,10 @@ const draw = (
     });
 
     // Draw bullets
-    ctx.fillStyle = 'red';
-    bullets.forEach((bullet) => {
+    bullets.forEach((bullet: Bullet) => {
+        ctx.fillStyle = bullet.color;
         ctx.beginPath();
-        ctx.arc(bullet.x, bullet.y, 5, 0, Math.PI * 2);
+        ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
         ctx.fill();
     });
 

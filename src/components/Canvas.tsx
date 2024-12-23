@@ -1,11 +1,26 @@
 import React, { useEffect, useRef, useState } from 'react';
 import draw from '../functions/draw';
-import { arenaHeight, arenaWidth, bulletSpeed } from '../constants/measures';
+import { arenaHeight, arenaWidth, deceleration } from '../constants/measures';
 import { obstacles } from '../constants/obstacles';
-import { bullets } from '../constants/bullets';
-import { Hit, Obstacle, Vehicle } from '../interfaces/sharedInterfaces';
+import { Bullet, Hit, Obstacle, Vehicle, VehicleWithRole, Weapon } from '../interfaces/sharedInterfaces';
 import { getRigByName } from '../functions/utils';
 import { isRotatedRectColliding } from '../functions/collisionDetect';
+import { fireWeapon } from '../functions/fireWeapon';
+import { weapons } from '../constants/weapons';
+import { placeHolder1, placeHolder2 } from '../constants/rigs';
+import { updateRigMovement } from '../functions/updateRigMovement';
+import { getAIInput } from '../functions/aiFunctions';
+
+interface MatchEndState {
+  winner: string;
+  finalObject: {
+    ctx: CanvasRenderingContext2D;
+    canvas: HTMLCanvasElement;
+    vehicles: { vehicle: Vehicle; role: 'player' | 'ai' }[];
+    hits: Hit[];
+    bullets: Bullet[];
+  };
+}
 
 interface CanvasProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -22,6 +37,7 @@ const Canvas: React.FC<CanvasProps> = ({
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
+  const [endOfTheMatch, setEndOfTheMatch] = useState<MatchEndState | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -32,43 +48,33 @@ const Canvas: React.FC<CanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
+    let bullets: Bullet[] = [];
+
     const vehicles: { vehicle: Vehicle; role: 'player' | 'ai' }[] = [
-      {
-        vehicle: {
-          name: 'test Rig',
-          x: 800 / 2,
-          y: 600 / 2,
-          width: 40,
-          height: 20,
-          angle: 0,
-          speed: 3,
-          hitPoints: 9,
-          weapons: {},
-        },
-        role: 'player',
-      },
-      {
-        vehicle: {
-          name: 'ai Rig',
-          x: 800 / 4,
-          y: 600 / 4,
-          width: 40,
-          height: 20,
-          angle: 0,
-          speed: 3,
-          hitPoints: 9,
-          weapons: {},
-        },
-        role: 'ai',
-      },
+      // place holders, test Rig and ai Rig
+      placeHolder1,
+      placeHolder2
     ];
+
     // updates Rig objects to match selected rigs
     const pRig = getRigByName(playerRig);
     const oRig = getRigByName(opponentRig);
 
     if (pRig && oRig) {
-      vehicles[0].vehicle = { ...pRig, x: 600, y: 500 };
-      vehicles[1].vehicle = { ...oRig, x: 150, y: 150 };
+      vehicles[0].vehicle = {
+        ...pRig,
+        x: 600,
+        y: 500,
+        velocityX: 0,
+        velocityY: 0
+      };
+      vehicles[1].vehicle = {
+        ...oRig,
+        x: 150,
+        y: 150,
+        velocityX: 0,
+        velocityY: 0
+      };
     }
 
     const hits: Hit[] = [];
@@ -95,17 +101,23 @@ const Canvas: React.FC<CanvasProps> = ({
       const mouseX = e.clientX - rect.left;
       const mouseY = e.clientY - rect.top;
       const playerRig = vehicles.find(v => v.role === 'player')?.vehicle;
-      
+
       if (playerRig) {
-        const angle = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
-        bullets.push({
-          x: playerRig.x,
-          y: playerRig.y,
-          angle,
-          owner: 'player',
-          color: 'red',
-          damage: 1,
-        });
+        const angle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        const shootingGun: Weapon | undefined = weapons.find(w => w.name === playerRig.weapons.turretGun?.name);
+
+        if (shootingGun) {
+          bullets = fireWeapon(
+            {
+              x: playerRig.x,
+              y: playerRig.y,
+              angle: angle,
+            },
+            shootingGun,
+            bullets,
+            'player'
+          );
+        };
       }
     };
 
@@ -114,65 +126,57 @@ const Canvas: React.FC<CanvasProps> = ({
     canvas.addEventListener('mousedown', handleMouseDown);
 
     const update = () => {
-      const playerRig = vehicles.find(v => v.role === 'player')?.vehicle;
-      const aiRig = vehicles.find(v => v.role === 'ai')?.vehicle;
+      const playerRig: Vehicle | undefined = vehicles.find(v => v.role === 'player')?.vehicle;
+      const aiRig: Vehicle | undefined = vehicles.find(v => v.role === 'ai')?.vehicle;
 
       if (!playerRig || !aiRig) return;
-
-      // Update player movement
-      const nextPlayerRig = {
-        ...playerRig,
-        x: playerRig.x + (keys.ArrowUp ? Math.cos(playerRig.angle) * playerRig.speed : 0) -
-          (keys.ArrowDown ? Math.cos(playerRig.angle) * playerRig.speed : 0),
-        y: playerRig.y + (keys.ArrowUp ? Math.sin(playerRig.angle) * playerRig.speed : 0) -
-          (keys.ArrowDown ? Math.sin(playerRig.angle) * playerRig.speed : 0),
-      };
-
-      if (
-        !obstacles.some(obstacle =>
-          isRotatedRectColliding(nextPlayerRig, { x: obstacle.x + obstacle.width / 2, y: obstacle.y + obstacle.height / 2, width: obstacle.width, height: obstacle.height, angle: 0 })
-        ) &&
-        !isRotatedRectColliding(nextPlayerRig, aiRig)
-      ) {
-        Object.assign(playerRig, nextPlayerRig);
-      }
-
+      
+      updateRigMovement(playerRig, keys, obstacles, aiRig, deceleration);
+      const aiKeys = getAIInput(aiRig, playerRig, obstacles);
+      //console.log('aikeys: ', aiKeys);
+      updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
+  /*
       // AI movement and shooting
       aiRig.angle += (Math.random() - 0.5) * 0.1;
 
       if (Math.random() < 0.02) {
         const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
-        bullets.push({
-          x: aiRig.x,
-          y: aiRig.y,
-          angle,
-          owner: 'ai',
-          color: 'black',
-          damage: 1,
-        });
+        const shootingGun: Weapon | undefined = weapons.find(w => w.name === aiRig.weapons.turretGun?.name);
+
+        if (shootingGun) {
+          bullets = fireWeapon(
+            {
+              x: aiRig.x,
+              y: aiRig.y,
+              angle: angle
+            },
+            shootingGun,
+            bullets,
+            'ai'
+          );
+        };
       }
-
+*/
       // Rotate player Rig
-      if (keys.ArrowLeft) playerRig.angle -= 0.05;
-      if (keys.ArrowRight) playerRig.angle += 0.05;
 
+/*
       // Keep AI within bounds
       aiRig.x = Math.max(aiRig.width / 2, Math.min(canvas.width - aiRig.width / 2, aiRig.x));
       aiRig.y = Math.max(aiRig.height / 2, Math.min(canvas.height - aiRig.height / 2, aiRig.y));
-      
+*/
       // Update bullets
       for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];
 
         // Move bullet
-        bullet.x += Math.cos(bullet.angle) * 5; // Adjust speed as needed
-        bullet.y += Math.sin(bullet.angle) * 5;
+        bullet.x += Math.cos(bullet.angle) * bullet.speed; // Adjust speed as needed
+        bullet.y += Math.sin(bullet.angle) * bullet.speed;
 
         // Check collision with player
         if (
           bullet.owner === 'ai' &&
           isRotatedRectColliding(
-            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: 5, height: 5, angle: 0 },
+            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: bullet.size, height: bullet.size, angle: 0 },
             { x: playerRig.x - playerRig.width / 2, y: playerRig.y - playerRig.height / 2, width: playerRig.width, height: playerRig.height, angle: playerRig.angle }
           )
         ) {
@@ -185,7 +189,7 @@ const Canvas: React.FC<CanvasProps> = ({
         if (
           bullet.owner === 'player' &&
           isRotatedRectColliding(
-            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: 5, height: 5, angle: 0 },
+            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: bullet.size, height: bullet.size, angle: 0 },
             { x: aiRig.x - aiRig.width / 2, y: aiRig.y - aiRig.height / 2, width: aiRig.width, height: aiRig.height, angle: aiRig.angle }
           )
         ) {
@@ -195,7 +199,7 @@ const Canvas: React.FC<CanvasProps> = ({
         }
 
         // Check collision with obstacles
-        let bulletHitObstacle = false;
+        let bulletHitObstacle: boolean = false;
         for (const obstacle of obstacles) {
           if (
             isRotatedRectColliding(
@@ -225,14 +229,29 @@ const Canvas: React.FC<CanvasProps> = ({
 
     const loop = () => {
       if (vehicles.some(v => v.vehicle.hitPoints <= 0)) {
+        console.log('0 hp');
         const winner = vehicles.find(v => v.vehicle.hitPoints > 0)?.role === 'player' ? 'Player Wins!' : 'AI Wins!';
         setMessage(winner);
         setView('afterBattle');
+        // Render final state directly here
+        draw(ctx, canvas, vehicles.map(v => v.vehicle), hits, bullets);
+
+        // Save final state for possible later use
+        setEndOfTheMatch({
+          winner,
+          finalObject: {
+            ctx,
+            canvas,
+            vehicles,
+            hits,
+            bullets,
+          },
+        });
         return;
       }
 
       update();
-      draw(ctx, canvas, vehicles.map(v => v.vehicle), hits);
+      draw(ctx, canvas, vehicles.map(v => v.vehicle), hits, bullets);
       requestAnimationFrame(loop);
     };
 
