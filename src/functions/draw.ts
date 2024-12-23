@@ -76,15 +76,19 @@ const draw = (
         }
     
         // texts of player rig
-        ctx.font = '12px Arial';
+        ctx.font = '14px Arial';
         ctx.fillStyle = 'cyan';
         ctx.fillText(rig.name, rig.x, rig.y);
         ctx.fillStyle = 'cyan';
-        ctx.fillText(JSON.stringify(rig.hitPoints), rig.x + 10, rig.y + 20);
+        ctx.fillText(JSON.stringify(rig.hitPoints), rig.x + 20, rig.y + 20);
         // gun
-        ctx.fillStyle = 'cyan';
+        if (rig.weapons.turretGun?.cooldown === 0) {
+            ctx.fillStyle = 'green';
+        } else {
+            ctx.fillStyle = 'red';
+        }
         ctx.fillText(JSON.stringify(rig.weapons.turretGun?.name), rig.x + 10, rig.y + 35);
-        ctx.fillText(JSON.stringify(rig.weapons.turretGun?.cooldown), rig.x + 10, rig.y + 45);
+        //ctx.fillText(JSON.stringify(rig.weapons.turretGun?.cooldown), rig.x + 10, rig.y + 45);
     });
  
     // Draw obstacles
