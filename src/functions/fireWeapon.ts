@@ -5,8 +5,13 @@ export const fireWeapon = (
     weapon: Weapon,
     bullets: Bullet[], 
     owner: 'player' | 'ai',
+    shooter: Vehicle
     ): Bullet[] => {
-
+    
+    if (shooter.weapons.turretGun) {
+        shooter.weapons.turretGun.cooldown = weapon.cooldown;
+    }
+    
     bullets.push({
         x: from.x,
         y: from.y,

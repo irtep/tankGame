@@ -10,6 +10,7 @@ import { weapons } from '../constants/weapons';
 import { placeHolder1, placeHolder2 } from '../constants/rigs';
 import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
+import { reloadWeapons } from '../functions/reloadWeapons';
 
 interface MatchEndState {
   winner: string;
@@ -106,7 +107,7 @@ const Canvas: React.FC<CanvasProps> = ({
         const angle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
         const shootingGun: Weapon | undefined = weapons.find(w => w.name === playerRig.weapons.turretGun?.name);
 
-        if (shootingGun) {
+        if (shootingGun && playerRig.weapons.turretGun?.cooldown === 0) {
           bullets = fireWeapon(
             {
               x: playerRig.x,
@@ -115,7 +116,8 @@ const Canvas: React.FC<CanvasProps> = ({
             },
             shootingGun,
             bullets,
-            'player'
+            'player',
+            playerRig
           );
         };
       }
@@ -124,6 +126,10 @@ const Canvas: React.FC<CanvasProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousedown', handleMouseDown);
+
+    const weaponReloadInterval = setInterval( () => {
+      reloadWeapons(vehicles);
+    }, 1000);
 
     const update = () => {
       const playerRig: Vehicle | undefined = vehicles.find(v => v.role === 'player')?.vehicle;
@@ -135,15 +141,13 @@ const Canvas: React.FC<CanvasProps> = ({
       const aiKeys = getAIInput(aiRig, playerRig, obstacles);
       //console.log('aikeys: ', aiKeys);
       updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
-  /*
-      // AI movement and shooting
-      aiRig.angle += (Math.random() - 0.5) * 0.1;
 
-      if (Math.random() < 0.02) {
+      // AI shoots
+      if (aiRig.weapons.turretGun?.cooldown === 0) {
         const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
         const shootingGun: Weapon | undefined = weapons.find(w => w.name === aiRig.weapons.turretGun?.name);
 
-        if (shootingGun) {
+        if (shootingGun && aiRig.weapons.turretGun?.cooldown === 0) {
           bullets = fireWeapon(
             {
               x: aiRig.x,
@@ -152,18 +156,12 @@ const Canvas: React.FC<CanvasProps> = ({
             },
             shootingGun,
             bullets,
-            'ai'
+            'ai',
+            aiRig
           );
         };
       }
-*/
-      // Rotate player Rig
 
-/*
-      // Keep AI within bounds
-      aiRig.x = Math.max(aiRig.width / 2, Math.min(canvas.width - aiRig.width / 2, aiRig.x));
-      aiRig.y = Math.max(aiRig.height / 2, Math.min(canvas.height - aiRig.height / 2, aiRig.y));
-*/
       // Update bullets
       for (let i = bullets.length - 1; i >= 0; i--) {
         const bullet = bullets[i];

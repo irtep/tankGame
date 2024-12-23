@@ -43,8 +43,8 @@ const draw = (
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    rigs.forEach( (tank: Vehicle) => {
-        const imgKey = tank.battleImg;
+    rigs.forEach( (rig: Vehicle) => {
+        const imgKey = rig.battleImg;
         if (imgKey) {
             // Check if the image is already in the cache
             if (!imageCache[imgKey]) {
@@ -59,48 +59,34 @@ const draw = (
             const img = imageCache[imgKey];
             if (img) {
                 ctx.save();
-                ctx.translate(tank.x, tank.y);
-                ctx.rotate(tank.angle);
-                ctx.drawImage(img, -tank.width / 2, -tank.height / 2, tank.width, tank.height);
+                ctx.translate(rig.x, rig.y);
+                ctx.rotate(rig.angle);
+                ctx.drawImage(img, -rig.width / 2, -rig.height / 2, rig.width, rig.height);
                 ctx.restore();
             }
         } else {
             // backup to draw just a box
             console.log('drawing backup');
             ctx.save();
-            ctx.translate(tank.x, tank.y);
-            ctx.rotate(tank.angle);
+            ctx.translate(rig.x, rig.y);
+            ctx.rotate(rig.angle);
             ctx.fillStyle = 'blue';
-            ctx.fillRect(-tank.width / 2, -tank.height / 2, tank.width, tank.height);
+            ctx.fillRect(-rig.width / 2, -rig.height / 2, rig.width, rig.height);
             ctx.restore();
         }
     
-        // texts of player tank
-        ctx.font = '10px Arial';
-        ctx.fillStyle = 'white';
-        ctx.fillText(tank.name, tank.x, tank.y);
-        ctx.fillStyle = 'white';
-        ctx.fillText(JSON.stringify(tank.hitPoints), tank.x, tank.y + 20);
-    
+        // texts of player rig
+        ctx.font = '12px Arial';
+        ctx.fillStyle = 'cyan';
+        ctx.fillText(rig.name, rig.x, rig.y);
+        ctx.fillStyle = 'cyan';
+        ctx.fillText(JSON.stringify(rig.hitPoints), rig.x + 10, rig.y + 20);
+        // gun
+        ctx.fillStyle = 'cyan';
+        ctx.fillText(JSON.stringify(rig.weapons.turretGun?.name), rig.x + 10, rig.y + 35);
+        ctx.fillText(JSON.stringify(rig.weapons.turretGun?.cooldown), rig.x + 10, rig.y + 45);
     });
-    
-
-    // Draw AI tank
-    /*
-    ctx.save();
-    ctx.translate(aiTank.x, aiTank.y);
-    ctx.rotate(aiTank.angle);
-    ctx.fillStyle = 'blue';
-    ctx.fillRect(-aiTank.width / 2, -aiTank.height / 2, aiTank.width, aiTank.height);
-    ctx.restore();
-
-    // texts of ai tank
-    ctx.font = '10px Arial';
-    ctx.fillStyle = 'white';
-    ctx.fillText(aiTank.name, aiTank.x, aiTank.y);
-    ctx.fillStyle = 'white';
-    ctx.fillText(JSON.stringify(aiTank.hitPoints), aiTank.x, aiTank.y + 20);
-*/
+ 
     // Draw obstacles
     ctx.fillStyle = 'gray';
     obstacles.forEach((obstacle) => {
