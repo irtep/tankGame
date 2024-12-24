@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import draw from '../functions/draw';
 import { arenaHeight, arenaWidth, deceleration } from '../constants/measures';
 import { obstacles } from '../constants/obstacles';
-import { Bullet, Hit, Obstacle, Vehicle, VehicleWithRole, Weapon } from '../interfaces/sharedInterfaces';
+import { Bullet, Hit, MatchEndState, Obstacle, Vehicle, VehicleWithRole, Weapon } from '../interfaces/sharedInterfaces';
 import { getRigByName } from '../functions/utils';
 import { isRotatedRectColliding } from '../functions/collisionDetect';
 import { fireWeapon } from '../functions/fireWeapon';
@@ -12,33 +12,23 @@ import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
 import { reloadWeapons } from '../functions/reloadWeapons';
 
-interface MatchEndState {
-  winner: string;
-  finalObject: {
-    ctx: CanvasRenderingContext2D;
-    canvas: HTMLCanvasElement;
-    vehicles: { vehicle: Vehicle; role: 'player' | 'ai' }[];
-    hits: Hit[];
-    bullets: Bullet[];
-  };
-}
-
 interface CanvasProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
   view: 'menu' | 'battle' | 'preBattle' | 'afterBattle';
   playerRig: string;
   opponentRig: string;
+  setEndOfTheMatch: React.Dispatch<React.SetStateAction<MatchEndState | null>>;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
   setView,
   view,
   playerRig,
-  opponentRig
+  opponentRig,
+  setEndOfTheMatch
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
-  const [endOfTheMatch, setEndOfTheMatch] = useState<MatchEndState | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -107,6 +97,7 @@ const Canvas: React.FC<CanvasProps> = ({
         const angle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
         const shootingGun: Weapon | undefined = weapons.find(w => w.name === playerRig.weapons.turretGun?.name);
 
+        // players shooting
         if (shootingGun && playerRig.weapons.turretGun?.cooldown === 0) {
           bullets = fireWeapon(
             {
@@ -127,10 +118,6 @@ const Canvas: React.FC<CanvasProps> = ({
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousedown', handleMouseDown);
 
-    const weaponReloadInterval = setInterval( () => {
-      reloadWeapons(vehicles);
-    }, 1000);
-
     const update = () => {
       const playerRig: Vehicle | undefined = vehicles.find(v => v.role === 'player')?.vehicle;
       const aiRig: Vehicle | undefined = vehicles.find(v => v.role === 'ai')?.vehicle;
@@ -139,7 +126,6 @@ const Canvas: React.FC<CanvasProps> = ({
       
       updateRigMovement(playerRig, keys, obstacles, aiRig, deceleration);
       const aiKeys = getAIInput(aiRig, playerRig, obstacles);
-      //console.log('aikeys: ', aiKeys);
       updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
 
       // AI shoots
@@ -174,7 +160,7 @@ const Canvas: React.FC<CanvasProps> = ({
         if (
           bullet.owner === 'ai' &&
           isRotatedRectColliding(
-            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: bullet.size, height: bullet.size, angle: 0 },
+            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: bullet.size + 3, height: bullet.size + 3, angle: 0 },
             { x: playerRig.x - playerRig.width / 2, y: playerRig.y - playerRig.height / 2, width: playerRig.width, height: playerRig.height, angle: playerRig.angle }
           )
         ) {
@@ -228,7 +214,10 @@ const Canvas: React.FC<CanvasProps> = ({
     const loop = () => {
       if (vehicles.some(v => v.vehicle.hitPoints <= 0)) {
         console.log('0 hp');
-        const winner = vehicles.find(v => v.vehicle.hitPoints > 0)?.role === 'player' ? 'Player Wins!' : 'AI Wins!';
+        const winner = 
+          vehicles.find(v => v.vehicle.hitPoints > 0)?.role === 'player'
+            ? 'Player Wins!'
+            : 'AI Wins!';
         setMessage(winner);
         setView('afterBattle');
         // Render final state directly here
@@ -251,6 +240,7 @@ const Canvas: React.FC<CanvasProps> = ({
       update();
       draw(ctx, canvas, vehicles.map(v => v.vehicle), hits, bullets);
       requestAnimationFrame(loop);
+      reloadWeapons(vehicles);
     };
 
     if (view === 'battle') {

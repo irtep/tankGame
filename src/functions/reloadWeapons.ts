@@ -7,6 +7,10 @@ export const reloadWeapons = (vehicles: VehicleWithRole[]) => {
                 v.vehicle.weapons.turretGun.cooldown > 0
             ) {
                 v.vehicle.weapons.turretGun.cooldown--; // cooling down
+
+                if (v.vehicle.weapons.turretGun.cooldown < 0) {
+                    v.vehicle.weapons.turretGun.cooldown = 0;
+                }
             }
         });
     }

@@ -24,6 +24,17 @@ export interface WeaponArray {
     rightBackGun?: ArmedWeapon; // fires from side, quite back
 };
 
+export interface MatchEndState {
+  winner: string;
+  finalObject: {
+    ctx: CanvasRenderingContext2D;
+    canvas: HTMLCanvasElement;
+    vehicles: { vehicle: Vehicle; role: 'player' | 'ai' }[];
+    hits: Hit[];
+    bullets: Bullet[];
+  };
+}
+
 export interface Vehicle {
     name: string;
     type: string;
