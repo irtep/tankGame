@@ -9,6 +9,15 @@ export interface Obstacle {
 export interface Hit {
     x: number;
     y: number;
+    damage: number;
+};
+
+export interface RadarImage {
+    x: number;
+    y: number;
+    angle: number;
+    width: number;
+    height: number;
 };
 
 export interface ArmedWeapon {
@@ -24,15 +33,18 @@ export interface WeaponArray {
     rightBackGun?: ArmedWeapon; // fires from side, quite back
 };
 
+export interface GameObject {
+  vehicles: VehicleWithRole[],
+  arena: Obstacle[],
+  hits: Hit[],
+  bullets: Bullet[],
+  updateCounter: number;
+  radars: RadarImage[]
+};
+
 export interface MatchEndState {
   winner: string;
-  finalObject: {
-    ctx: CanvasRenderingContext2D;
-    canvas: HTMLCanvasElement;
-    vehicles: { vehicle: Vehicle; role: 'player' | 'ai' }[];
-    hits: Hit[];
-    bullets: Bullet[];
-  };
+  gameObject: GameObject
 }
 
 export interface Vehicle {

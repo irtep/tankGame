@@ -1,4 +1,4 @@
-import { Bullet, Vehicle } from "../interfaces/sharedInterfaces";
+import { Bullet, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
 import { obstacles } from "../constants/obstacles";
 import { Hit } from "../interfaces/sharedInterfaces";
 
@@ -32,65 +32,69 @@ const drawExplosion = (ctx: CanvasRenderingContext2D, x: number, y: number, radi
     ctx.fill();
 }
 
+const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
+    const imgKey = vehicle.battleImg;
+    if (imgKey) {
+        // Check if the image is already in the cache
+        if (!imageCache[imgKey]) {
+            const img = new Image();
+            img.onerror = (error) => {
+                console.error('Error loading image:', error);
+            };
+            img.src = process.env.PUBLIC_URL + `/img/${imgKey}`;
+            imageCache[imgKey] = img;
+        }
+
+        const img = imageCache[imgKey];
+        if (img) {
+            ctx.save();
+            ctx.translate(vehicle.x, vehicle.y);
+            ctx.rotate(vehicle.angle);
+            ctx.drawImage(img, -vehicle.width / 2, -vehicle.height / 2, vehicle.width, vehicle.height);
+            ctx.restore();
+        }
+    } else {
+        // backup to draw just a box
+        console.log('drawing backup');
+        ctx.save();
+        ctx.translate(vehicle.x, vehicle.y);
+        ctx.rotate(vehicle.angle);
+        ctx.fillStyle = 'blue';
+        ctx.fillRect(-vehicle.width / 2, -vehicle.height / 2, vehicle.width, vehicle.height);
+        ctx.restore();
+    }
+
+    // texts of player rig
+    ctx.font = '14px Arial';
+    ctx.fillStyle = 'cyan';
+    ctx.fillText(vehicle.name, vehicle.x, vehicle.y);
+    ctx.fillStyle = 'cyan';
+    ctx.fillText(JSON.stringify(vehicle.hitPoints), vehicle.x + 20, vehicle.y + 20);
+    // gun
+    if (vehicle.weapons.turretGun?.cooldown === 0) {
+        ctx.fillStyle = 'green';
+    } else {
+        ctx.fillStyle = 'red';
+    }
+    ctx.fillText(JSON.stringify(vehicle.weapons.turretGun?.name), vehicle.x + 10, vehicle.y + 35);
+}
+
 const draw = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
     rigs: Vehicle[],
     hits: Hit[],
-    bullets: Bullet[]
+    bullets: Bullet[],
+    radars: RadarImage[]
 ) => {
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    rigs.forEach( (rig: Vehicle) => {
-        const imgKey = rig.battleImg;
-        if (imgKey) {
-            // Check if the image is already in the cache
-            if (!imageCache[imgKey]) {
-                const img = new Image();
-                img.onerror = (error) => {
-                    console.error('Error loading image:', error);
-                };
-                img.src = process.env.PUBLIC_URL + `/img/${imgKey}`;
-                imageCache[imgKey] = img;
-            }
-        
-            const img = imageCache[imgKey];
-            if (img) {
-                ctx.save();
-                ctx.translate(rig.x, rig.y);
-                ctx.rotate(rig.angle);
-                ctx.drawImage(img, -rig.width / 2, -rig.height / 2, rig.width, rig.height);
-                ctx.restore();
-            }
-        } else {
-            // backup to draw just a box
-            console.log('drawing backup');
-            ctx.save();
-            ctx.translate(rig.x, rig.y);
-            ctx.rotate(rig.angle);
-            ctx.fillStyle = 'blue';
-            ctx.fillRect(-rig.width / 2, -rig.height / 2, rig.width, rig.height);
-            ctx.restore();
-        }
-    
-        // texts of player rig
-        ctx.font = '14px Arial';
-        ctx.fillStyle = 'cyan';
-        ctx.fillText(rig.name, rig.x, rig.y);
-        ctx.fillStyle = 'cyan';
-        ctx.fillText(JSON.stringify(rig.hitPoints), rig.x + 20, rig.y + 20);
-        // gun
-        if (rig.weapons.turretGun?.cooldown === 0) {
-            ctx.fillStyle = 'green';
-        } else {
-            ctx.fillStyle = 'red';
-        }
-        ctx.fillText(JSON.stringify(rig.weapons.turretGun?.name), rig.x + 10, rig.y + 35);
-        //ctx.fillText(JSON.stringify(rig.weapons.turretGun?.cooldown), rig.x + 10, rig.y + 45);
+    rigs.forEach((rig: Vehicle) => {
+        drawVehicle(ctx, rig);
     });
- 
+
     // Draw obstacles
     ctx.fillStyle = 'gray';
     obstacles.forEach((obstacle) => {
@@ -108,9 +112,27 @@ const draw = (
     // Draw hits:
     ctx.fillStyle = 'darkred';
     hits.forEach((hit: Hit) => {
-        ctx.beginPath();
-        ctx.arc(hit.x, hit.y, 5, 0, Math.PI * 2);
-        ctx.fill();
+        drawExplosion(ctx, hit.x, hit.y, hit.damage * 10, 5, 'yellow');
+    });
+
+    // radar images for debug reasons, if needed
+    radars.forEach((radar: RadarImage) => {
+        ctx.save();
+    
+        // Translate to the radar's position
+        ctx.translate(radar.x, radar.y);
+        
+        // Rotate the canvas to match the radar's angle (convert degrees to radians if needed)
+        ctx.rotate(radar.angle);
+        
+        // Set the stroke style
+        ctx.strokeStyle = 'blue';
+        
+        // Draw the rectangle, centered at the origin
+        ctx.strokeRect(-radar.width / 2, -radar.height / 2, radar.width, radar.height);
+        
+        // Restore the canvas state
+        ctx.restore();
     });
 };
 
