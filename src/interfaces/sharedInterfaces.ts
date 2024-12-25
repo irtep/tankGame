@@ -15,14 +15,13 @@ export interface Hit {
 export interface RadarImage {
     x: number;
     y: number;
-    angle: number;
-    width: number;
-    height: number;
 };
 
 export interface ArmedWeapon {
     name: string;
     cooldown: number;
+    offsetX: number;
+    offsetY: number;
 }
 
 export interface WeaponArray {
@@ -31,6 +30,11 @@ export interface WeaponArray {
     rightSideGun?: ArmedWeapon; // fires from side, quite front
     leftBackGun?: ArmedWeapon; // fires from side, quite back
     rightBackGun?: ArmedWeapon; // fires from side, quite back
+};
+
+export interface CollisionReport {
+    collision: boolean;
+    withWhat: string;
 };
 
 export interface GameObject {
@@ -65,7 +69,7 @@ export interface Vehicle {
     battleImg?: string;
     descImg?: string;
     reloadStatus?: number;
-    weapons: WeaponArray;
+    weapons: ArmedWeapon[];
 };
 
 export interface VehicleWithRole {

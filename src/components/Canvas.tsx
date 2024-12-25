@@ -2,17 +2,15 @@ import React, { useEffect, useRef, useState } from 'react';
 import draw from '../functions/draw';
 import { arenaHeight, arenaWidth, deceleration } from '../constants/measures';
 import { obstacles } from '../constants/obstacles';
-import { GameObject, MatchEndState, Vehicle, Weapon } from '../interfaces/sharedInterfaces';
+import { CollisionReport, GameObject, MatchEndState, Vehicle } from '../interfaces/sharedInterfaces';
 import { getRigByName } from '../functions/utils';
 import { isRotatedRectColliding } from '../functions/collisionDetect';
-import { fireWeapon } from '../functions/fireWeapon';
-import { weapons } from '../constants/weapons';
+import { shoot } from '../functions/fireWeapon';
 import { placeHolder1, placeHolder2 } from '../constants/rigs';
 import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
 import { reloadWeapons } from '../functions/reloadWeapons';
-import { isTargetInFront } from '../functions/isTargetInFront';
-import { checkIfArcInFront } from '../functions/createRadarImage';
+import { radarCheck } from '../functions/radarCheck';
 
 interface CanvasProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -92,39 +90,22 @@ const Canvas: React.FC<CanvasProps> = ({
     };
 
     const handleMouseDown = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect();
-      const mouseX = e.clientX - rect.left;
-      const mouseY = e.clientY - rect.top;
-      const playerRig = gameObject.vehicles.find(v => v.role === 'player')?.vehicle;
-      const aiRig = gameObject.vehicles.find(v => v.role === 'ai')?.vehicle;
+      const rect: DOMRect = canvas.getBoundingClientRect();
+      const mouseX: number = e.clientX - rect.left;
+      const mouseY: number = e.clientY - rect.top;
+      const playerRig: Vehicle | undefined = gameObject.vehicles.find(v => v.role === 'player')?.vehicle;
+      const aiRig: Vehicle | undefined = gameObject.vehicles.find(v => v.role === 'ai')?.vehicle;
 
-      if (playerRig) {
-        const angle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
-        const shootingGun: Weapon | undefined = weapons.find(w => w.name === playerRig.weapons.turretGun?.name);
-
-        if (aiRig) {
-          //const checkIfInFront = isTargetInFront(playerRig, aiRig);
-          //gameObject.radars.push(createRadarImage(playerRig));
-          console.log('created radar image: ', isTargetInFront(
-            playerRig,
-            aiRig
-          ));
-        }
-
-        // players shooting
-        if (shootingGun && playerRig.weapons.turretGun?.cooldown === 0) {
-          gameObject.bullets = fireWeapon(
-            {
-              x: playerRig.x,
-              y: playerRig.y,
-              angle: angle,
-            },
-            shootingGun,
-            gameObject.bullets,
-            'player',
-            playerRig
-          );
-        };
+      // player shooting:
+      if (playerRig && aiRig) {
+        const turretsAngle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        const checkingRadar: CollisionReport = radarCheck(
+          gameObject,
+          'player',
+          0,
+          'check for front weapons'
+        );
+        shoot(playerRig, gameObject, turretsAngle, checkingRadar, true);
       }
     };
 
@@ -144,10 +125,19 @@ const Canvas: React.FC<CanvasProps> = ({
       updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
 
       // AI shoots
-      if (aiRig.weapons.turretGun?.cooldown === 0) {
-        const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
-        const shootingGun: Weapon | undefined = weapons.find(w => w.name === aiRig.weapons.turretGun?.name);
+      
+      if (aiRig.weapons[0].cooldown === 0) {
 
+        const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
+        const checkingRadar: CollisionReport = radarCheck(
+          gameObject,
+          'ai',
+          0,
+          'check for front weapons'
+        );
+
+        shoot(aiRig, gameObject, angle, checkingRadar, false);
+/*
         if (shootingGun && aiRig.weapons.turretGun?.cooldown === 0) {
           gameObject.bullets = fireWeapon(
             {
@@ -161,6 +151,7 @@ const Canvas: React.FC<CanvasProps> = ({
             aiRig
           );
         };
+  */      
       }
 
       // Update gameObject.bullets
@@ -181,9 +172,11 @@ const Canvas: React.FC<CanvasProps> = ({
         ) {
           playerRig.hitPoints -= bullet.damage;
           gameObject.bullets.splice(i, 1); // Remove the bullet
-          gameObject.hits.push({x: bullet.x,
-                                y: bullet.y,
-                                damage: bullet.damage});
+          gameObject.hits.push({
+            x: bullet.x,
+            y: bullet.y,
+            damage: bullet.damage
+          });
           continue;
         }
 
@@ -197,9 +190,11 @@ const Canvas: React.FC<CanvasProps> = ({
         ) {
           aiRig.hitPoints -= bullet.damage;
           gameObject.bullets.splice(i, 1); // Remove the bullet
-          gameObject.hits.push({x: bullet.x,
-                                y: bullet.y,
-                                damage: bullet.damage});
+          gameObject.hits.push({
+            x: bullet.x,
+            y: bullet.y,
+            damage: bullet.damage
+          });
           continue;
         }
 
@@ -270,8 +265,8 @@ const Canvas: React.FC<CanvasProps> = ({
       reloadWeapons(gameObject.vehicles);
       // every tenth update removes some hits
       if (gameObject.hits.length > 0 &&
-          gameObject.updateCounter % 10 === 0
-       ) {
+        gameObject.updateCounter % 10 === 0
+      ) {
         gameObject.hits.shift();
       }
     };

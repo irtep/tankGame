@@ -1,4 +1,5 @@
-import { Bullet, Coordinates, Vehicle, Weapon } from "../interfaces/sharedInterfaces";
+import { weapons } from "../constants/weapons";
+import { ArmedWeapon, Bullet, CollisionReport, Coordinates, GameObject, Vehicle, VehicleWithRole, Weapon } from "../interfaces/sharedInterfaces";
 
 function getRandomNumber(max: number): number {
     if (max < 0) {
@@ -35,14 +36,13 @@ export const fireWeapon = (
     weapon: Weapon,
     bullets: Bullet[],
     owner: 'player' | 'ai',
-    shooter: Vehicle
+    shooter: Vehicle,
+    weaponsIndex: number
 ): Bullet[] => {
 
-    if (shooter.weapons.turretGun) {
-        shooter.weapons.turretGun.cooldown = weapon.cooldown;
+    if (weapon.cooldown) {
+        shooter.weapons[weaponsIndex].cooldown = weapon.cooldown;
     }
-
-    const speedOfShooter: number = Math.abs(shooter.velocityX) + Math.abs(shooter.velocityY);
 
     bullets.push(createBullet(
         from.x,
@@ -77,7 +77,7 @@ export const fireWeapon = (
             bullets.push(createBullet(
                 from.x + (getRandomNumber(spread)),
                 from.y + (getRandomNumber(spread)),
-                from.angle + (i/ angleOffset),
+                from.angle + (i / angleOffset),
                 owner,
                 weapon.color,
                 weapon.bulletSize,
@@ -89,3 +89,61 @@ export const fireWeapon = (
 
     return bullets;
 };
+
+export const shoot = (
+    shootingRig: Vehicle,
+    gameObject: GameObject,
+    turretsAngle: number,
+    checkingRadar: CollisionReport,
+    playerShooting: boolean
+): void => {
+    shootingRig.weapons.forEach((weaponInTurn: ArmedWeapon, i: number) => {
+        const shootingGun: Weapon | undefined = weapons.find(w => w.name === weaponInTurn.name);
+
+        if (shootingGun && weaponInTurn.cooldown <= 0) {
+            //console.log('cooldown ok for ', shootingGun.name);
+            if (shootingGun.turret) {
+                //console.log('turret gun');
+                gameObject.bullets = fireWeapon(
+                    {
+                        x: shootingRig.x + weaponInTurn.offsetX,
+                        y: shootingRig.y + weaponInTurn.offsetY,
+                        angle: turretsAngle,
+                    },
+                    shootingGun,
+                    gameObject.bullets,
+                    playerShooting ? 'player' : 'ai',
+                    shootingRig,
+                    i
+                );
+            } else {
+                //console.log('not turret');
+                // non turreted weapons
+                if (
+                    checkingRadar.withWhat === 'ai' ||
+                    checkingRadar.withWhat === 'player'
+                ) {
+                    //console.log('ai at front');
+                    gameObject.bullets = fireWeapon(
+                        {
+                            x: shootingRig.x + weaponInTurn.offsetX,
+                            y: shootingRig.y + weaponInTurn.offsetY,
+                            angle: turretsAngle,
+                        },
+                        shootingGun,
+                        gameObject.bullets,
+                        playerShooting ? 'player' : 'ai',
+                        shootingRig,
+                        i
+                    );
+                } else {
+                    //console.log('ai not at front');
+                }
+            }
+        } else {
+            //console.log('not found, or cooldown not ok', shootingGun?.cooldown);
+        }
+    });
+};
+
+

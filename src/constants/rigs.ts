@@ -1,4 +1,3 @@
-import { Verified } from "@mui/icons-material";
 import { Vehicle, VehicleWithRole } from "../interfaces/sharedInterfaces";
 
 export const rigs: Vehicle[] = [
@@ -20,21 +19,26 @@ export const rigs: Vehicle[] = [
         battleImg: 'bullterrier_battle.png',
         descImg: 'bullterrier_desc.jpg',
         reloadStatus: 0,
-        weapons: {
-            turretGun:
+        weapons: [
             {
                 name: 'accelerator',
-                cooldown: 0 // 0 is ready fire
+                cooldown: 0, // 0 is ready fire
+                offsetX: 0,
+                offsetY: 0
             },
-            leftSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 0
             },
-            rightSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 32
             }
-        },
+        ],
     },
     {
         name: 'Amazonas',
@@ -54,28 +58,38 @@ export const rigs: Vehicle[] = [
         battleImg: 'amazonas_battle.png',
         descImg: 'amazonas_desc.jpg',
         reloadStatus: 0,
-        weapons: {
-            turretGun: {
+        weapons: [
+            {
                 name: 'vanguard',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 0,
+                offsetY: 0
             },
-            leftSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 0
             },
-            rightSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 35
             },
-            leftBackGun: {
+            {
                 name: 'micro rocket pod',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: -10,
+                offsetY: 0
             },
-            rightBackGun: {
+            {
                 name: 'micro rocket pod',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: -10,
+                offsetY: 35
             },
-        }
+        ]
     },
     {
         name: 'Leprechaun',
@@ -95,20 +109,26 @@ export const rigs: Vehicle[] = [
         battleImg: 'leprechaun_battle.png',
         descImg: 'leprechaun_desc.jpg',
         reloadStatus: 0,
-        weapons: {
-            turretGun: {
+        weapons: [
+            {
                 name: 'rattler',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 0,
+                offsetY: 0
             },
-            leftSideGun: {
+            {
                 name: 'micro rocket pod',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 0
             },
-            rightSideGun: {
+            {
                 name: 'micro rocket pod',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 50
             },
-        }
+        ]
     },
     {
         name: 'Ice',
@@ -128,20 +148,26 @@ export const rigs: Vehicle[] = [
         battleImg: 'ice_battle.png',
         descImg: 'ice_desc.jpg',
         reloadStatus: 0,
-        weapons: {
-            turretGun: {
+        weapons: [
+            {
                 name: 'shreik missiles',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 0,
+                offsetY: 0
             },
-            leftSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 0
             },
-            rightSideGun: {
+            {
                 name: 'microbeam',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 25
             },
-        }
+        ]
     },
     {
         name: 'Starblade',
@@ -161,20 +187,26 @@ export const rigs: Vehicle[] = [
         battleImg: 'starblade_battle.png',
         descImg: 'starblade_desc.jpg',
         reloadStatus: 0,
-        weapons: {
-            turretGun: {
+        weapons: [
+            {
                 name: 'vengeance cannon',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 0,
+                offsetY: 0
             },
-            leftSideGun: {
+            {
                 name: 'blaster',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 0
             },
-            rightSideGun: {
+            {
                 name: 'blaster',
-                cooldown: 0
+                cooldown: 0,
+                offsetX: 30,
+                offsetY: 32
             }
-        }
+        ]
     }
 ];
 
@@ -193,7 +225,7 @@ export const placeHolder1: VehicleWithRole = {
         acceleration: 0.1,
         armour: 0,
         hitPoints: 9,
-        weapons: {},
+        weapons: [],
     },
     role: 'player',
 }
@@ -213,7 +245,7 @@ export const placeHolder2: VehicleWithRole = {
         acceleration: 0.1,
         armour: 0,
         hitPoints: 9,
-        weapons: {},
+        weapons: [],
     },
     role: 'ai',
 }

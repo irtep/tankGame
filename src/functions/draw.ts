@@ -1,4 +1,4 @@
-import { Bullet, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
+import { ArmedWeapon, Bullet, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
 import { obstacles } from "../constants/obstacles";
 import { Hit } from "../interfaces/sharedInterfaces";
 
@@ -64,19 +64,22 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
         ctx.restore();
     }
 
-    // texts of player rig
+    // texts rig
     ctx.font = '14px Arial';
     ctx.fillStyle = 'cyan';
     ctx.fillText(vehicle.name, vehicle.x, vehicle.y);
     ctx.fillStyle = 'cyan';
     ctx.fillText(JSON.stringify(vehicle.hitPoints), vehicle.x + 20, vehicle.y + 20);
-    // gun
-    if (vehicle.weapons.turretGun?.cooldown === 0) {
-        ctx.fillStyle = 'green';
-    } else {
-        ctx.fillStyle = 'red';
-    }
-    ctx.fillText(JSON.stringify(vehicle.weapons.turretGun?.name), vehicle.x + 10, vehicle.y + 35);
+    // guns
+    vehicle.weapons.forEach((w: ArmedWeapon, i: number) => {
+        if (w.cooldown === 0) {
+            ctx.fillStyle = 'cyan';
+        } else {
+            ctx.fillStyle = 'red';
+        }
+        ctx.fillText(JSON.stringify(w.name), vehicle.x + 10, vehicle.y + 35 + (11 * i));
+    });
+
 }
 
 const draw = (
@@ -116,24 +119,15 @@ const draw = (
     });
 
     // radar images for debug reasons, if needed
-    radars.forEach((radar: RadarImage) => {
-        ctx.save();
-    
-        // Translate to the radar's position
-        ctx.translate(radar.x, radar.y);
-        
-        // Rotate the canvas to match the radar's angle (convert degrees to radians if needed)
-        ctx.rotate(radar.angle);
-        
-        // Set the stroke style
-        ctx.strokeStyle = 'blue';
-        
-        // Draw the rectangle, centered at the origin
-        ctx.strokeRect(-radar.width / 2, -radar.height / 2, radar.width, radar.height);
-        
-        // Restore the canvas state
-        ctx.restore();
+    // need to activate too from radarCheck that push
+    /*
+    radars.forEach((radarWave: RadarImage) => {
+        ctx.fillStyle = 'darkRed';
+        ctx.beginPath();
+        ctx.arc(radarWave.x, radarWave.y, 5, 0, Math.PI * 2);
+        ctx.fill();
     });
+    */
 };
 
 export default draw;
