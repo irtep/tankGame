@@ -11,7 +11,14 @@ interface ImageCache {
 const imageCache: ImageCache = {};
 
 // Function to draw a star-like explosion
-const drawExplosion = (ctx: CanvasRenderingContext2D, x: number, y: number, radius: number, numPoints: number, color: string) => {
+const drawExplosion = (
+    ctx: CanvasRenderingContext2D,
+    x: number,
+    y: number,
+    radius: number,
+    numPoints: number,
+    color: string
+) => {
     ctx.beginPath();
     ctx.fillStyle = color;
 
@@ -82,15 +89,84 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
 
 }
 
+const drawTargetingX = (
+    ctx: CanvasRenderingContext2D,
+    canvas: HTMLCanvasElement,
+    mouseX: number,
+    mouseY: number,
+    mainGunAvailable: boolean,
+    secondaryGunAvailable: boolean
+) => {
+    // Clear the canvas
+    //ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw the targeting '+'
+    const crossSize = 20; // Size of the '+'
+    ctx.strokeStyle = 'blue';
+    ctx.lineWidth = 2;
+
+    // Vertical line of '+'
+    ctx.beginPath();
+    ctx.moveTo(mouseX, mouseY - crossSize);
+    ctx.lineTo(mouseX, mouseY + crossSize);
+    ctx.stroke();
+
+    // Horizontal line of '+'
+    ctx.beginPath();
+    ctx.moveTo(mouseX - crossSize, mouseY);
+    ctx.lineTo(mouseX + crossSize, mouseY);
+    ctx.stroke();
+
+    // Draw concentric circles
+    //const circleColors = ['red', 'orange', 'yellow', 'green', 'purple'];
+    for (let i = 1; i <= 2; i++) {
+        ctx.beginPath();
+        ctx.arc(mouseX, mouseY, i * 10, 0, 2 * Math.PI); // Circles with increasing radius
+        
+        if (i === 1) {
+            mainGunAvailable
+            ? ctx.strokeStyle = 'Chartreuse'
+            : ctx.strokeStyle = 'darkRed'
+        }
+        
+        if (i === 2) {
+            secondaryGunAvailable
+            ? ctx.strokeStyle = 'Chartreuse'
+            : ctx.strokeStyle = 'darkRed'
+        }
+        
+        ctx.stroke();
+    }
+};
+
 const draw = (
     ctx: CanvasRenderingContext2D,
     canvas: HTMLCanvasElement,
     rigs: Vehicle[],
     hits: Hit[],
     bullets: Bullet[],
-    radars: RadarImage[]
+    radars: RadarImage[],
+    mouseNowX: number,
+    mouseNowY: number
 ) => {
 
+    let mainGunAvailable = false;
+    let secondaryGunAvailable = false;
+
+    rigs[0].weapons.forEach( (w: ArmedWeapon, i: number) => {
+        // 0 is main gun
+        if (
+            i === 0 &&
+            w.cooldown === 0
+        ) {
+            mainGunAvailable = true;
+        } else if (
+            i > 0 &&
+            w.cooldown === 0
+        ) {
+            secondaryGunAvailable = true;
+        }
+    });
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
@@ -117,6 +193,16 @@ const draw = (
     hits.forEach((hit: Hit) => {
         drawExplosion(ctx, hit.x, hit.y, hit.damage * 10, 5, 'yellow');
     });
+
+    // draw targeting x
+    drawTargetingX(
+        ctx,
+        canvas,
+        mouseNowX,
+        mouseNowY,
+        mainGunAvailable,
+        secondaryGunAvailable
+    );
 
     // radar images for debug reasons, if needed
     // need to activate too from radarCheck that push

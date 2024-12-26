@@ -48,7 +48,9 @@ const Canvas: React.FC<CanvasProps> = ({
       hits: [],
       bullets: [],
       updateCounter: 0,
-      radars: []
+      radars: [],
+      mouseNowX: 0,
+      mouseNowY: 0
     };
 
     // updates Rig objects to match selected rigs
@@ -56,6 +58,7 @@ const Canvas: React.FC<CanvasProps> = ({
     const oRig = getRigByName(opponentRig);
 
     if (pRig && oRig) {
+      // gives vehicles selected values
       gameObject.vehicles[0].vehicle = {
         ...pRig,
         x: 600,
@@ -73,11 +76,16 @@ const Canvas: React.FC<CanvasProps> = ({
     }
 
     // Keyboard state
+    // supports arrows and wsad
     const keys: { [key: string]: boolean } = {
       ArrowUp: false,
       ArrowDown: false,
       ArrowLeft: false,
       ArrowRight: false,
+      w: false,
+      s: false,
+      a: false,
+      d: false,
     };
 
     // Event listeners for keyboard
@@ -112,6 +120,11 @@ const Canvas: React.FC<CanvasProps> = ({
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     canvas.addEventListener('mousedown', handleMouseDown);
+    canvas.addEventListener('mousemove', (e) => {
+      const rect = canvas.getBoundingClientRect();
+      gameObject.mouseNowX = e.clientX - rect.left;
+      gameObject.mouseNowY = e.clientY - rect.top;
+    });
 
     const update = () => {
       const playerRig: Vehicle | undefined = gameObject.vehicles.find(v => v.role === 'player')?.vehicle;
@@ -135,23 +148,7 @@ const Canvas: React.FC<CanvasProps> = ({
           0,
           'check for front weapons'
         );
-
-        shoot(aiRig, gameObject, angle, checkingRadar, false);
-/*
-        if (shootingGun && aiRig.weapons.turretGun?.cooldown === 0) {
-          gameObject.bullets = fireWeapon(
-            {
-              x: aiRig.x,
-              y: aiRig.y,
-              angle: angle
-            },
-            shootingGun,
-            gameObject.bullets,
-            'ai',
-            aiRig
-          );
-        };
-  */      
+        shoot(aiRig, gameObject, angle, checkingRadar, false);    
       }
 
       // Update gameObject.bullets
@@ -242,7 +239,9 @@ const Canvas: React.FC<CanvasProps> = ({
           gameObject.vehicles.map(v => v.vehicle),
           gameObject.hits,
           gameObject.bullets,
-          gameObject.radars
+          gameObject.radars,
+          gameObject.mouseNowX,
+          gameObject.mouseNowY
         );
 
         // Save final state for possible later use
@@ -259,7 +258,9 @@ const Canvas: React.FC<CanvasProps> = ({
         gameObject.vehicles.map(v => v.vehicle),
         gameObject.hits,
         gameObject.bullets,
-        gameObject.radars
+        gameObject.radars,
+        gameObject.mouseNowX,
+        gameObject.mouseNowY
       );
       requestAnimationFrame(loop);
       reloadWeapons(gameObject.vehicles);

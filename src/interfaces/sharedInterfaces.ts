@@ -43,7 +43,9 @@ export interface GameObject {
   hits: Hit[],
   bullets: Bullet[],
   updateCounter: number;
-  radars: RadarImage[]
+  radars: RadarImage[],
+  mouseNowX: number,
+  mouseNowY: number
 };
 
 export interface MatchEndState {

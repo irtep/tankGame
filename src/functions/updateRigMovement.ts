@@ -35,11 +35,11 @@ export const updateRigMovement = (
     deceleration: number
 ) => {
     // Update movement based on input keys
-    if (keys.ArrowUp) {
+    if (keys.ArrowUp || keys.w) {
         rig.velocityX += Math.cos(rig.angle) * rig.acceleration;
         rig.velocityY += Math.sin(rig.angle) * rig.acceleration;
     }
-    if (keys.ArrowDown) {
+    if (keys.ArrowDown || keys.s) {
         if (rig.type === 'tank') {
             rig.velocityX -= Math.cos(rig.angle) * rig.acceleration;
             rig.velocityY -= Math.sin(rig.angle) * rig.acceleration;
@@ -50,7 +50,11 @@ export const updateRigMovement = (
     }
 
     // Apply friction (deceleration)
-    if (!keys.ArrowUp && !keys.ArrowDown) {
+    if (!keys.ArrowUp &&
+        !keys.ArrowDown &&
+        !keys.w &&
+        !keys.s
+        ) {
         rig.velocityX *= 1 - deceleration;
         rig.velocityY *= 1 - deceleration;
     }
@@ -64,13 +68,13 @@ export const updateRigMovement = (
     }
 
 // Only change the angle if the new angle doesn't cause a collision
-if (keys.ArrowLeft) {
+if (keys.ArrowLeft || keys.a) {
     if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
         rig.angle -= 0.05;
     }
 }
 
-if (keys.ArrowRight) {
+if (keys.ArrowRight || keys.d) {
     if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
         rig.angle += 0.05;
     }
