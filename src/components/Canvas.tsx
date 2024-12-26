@@ -134,7 +134,7 @@ const Canvas: React.FC<CanvasProps> = ({
       if (!playerRig || !aiRig) return;
 
       updateRigMovement(playerRig, keys, obstacles, aiRig, deceleration);
-      const aiKeys = getAIInput(aiRig, playerRig, obstacles);
+      const aiKeys = getAIInput(gameObject, aiRig, playerRig);
       updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
 
       // AI shoots

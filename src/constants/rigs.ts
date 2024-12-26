@@ -30,15 +30,17 @@ export const rigs: Vehicle[] = [
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 0
+                offsetY: -15
             },
             {
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 32
+                offsetY: 15
             }
         ],
+        stuckFrames: 0,
+        lastPositions: []
     },
     {
         name: 'Amazonas',
@@ -69,27 +71,29 @@ export const rigs: Vehicle[] = [
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 0
+                offsetY: -15
             },
             {
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 35
+                offsetY: 15
             },
             {
                 name: 'micro rocket pod',
                 cooldown: 0,
                 offsetX: -10,
-                offsetY: 0
+                offsetY: -15
             },
             {
                 name: 'micro rocket pod',
                 cooldown: 0,
                 offsetX: -10,
-                offsetY: 35
+                offsetY: 15
             },
-        ]
+        ],
+        stuckFrames: 0,
+        lastPositions: []
     },
     {
         name: 'Leprechaun',
@@ -120,15 +124,17 @@ export const rigs: Vehicle[] = [
                 name: 'micro rocket pod',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 0
+                offsetY: -25
             },
             {
                 name: 'micro rocket pod',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 50
+                offsetY: 25
             },
-        ]
+        ],
+        stuckFrames: 0,
+        lastPositions: []
     },
     {
         name: 'Ice',
@@ -159,15 +165,17 @@ export const rigs: Vehicle[] = [
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 0
+                offsetY: -10
             },
             {
                 name: 'microbeam',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 25
+                offsetY: 10
             },
-        ]
+        ],
+        stuckFrames: 0,
+        lastPositions: []
     },
     {
         name: 'Starblade',
@@ -198,15 +206,17 @@ export const rigs: Vehicle[] = [
                 name: 'blaster',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 0
+                offsetY: -15
             },
             {
                 name: 'blaster',
                 cooldown: 0,
                 offsetX: 30,
-                offsetY: 32
+                offsetY: 15
             }
-        ]
+        ],
+        stuckFrames: 0,
+        lastPositions: []
     }
 ];
 
@@ -226,6 +236,8 @@ export const placeHolder1: VehicleWithRole = {
         armour: 0,
         hitPoints: 9,
         weapons: [],
+        stuckFrames: 0,
+        lastPositions: []
     },
     role: 'player',
 }
@@ -246,6 +258,8 @@ export const placeHolder2: VehicleWithRole = {
         armour: 0,
         hitPoints: 9,
         weapons: [],
+        stuckFrames: 0,
+        lastPositions: []
     },
     role: 'ai',
 }

@@ -1,116 +1,87 @@
-import { Obstacle, Vehicle } from "../interfaces/sharedInterfaces";
-import { isRotatedRectColliding } from "./collisionDetect";
+import { GameObject, Vehicle } from "../interfaces/sharedInterfaces";
+import { aiRadarCheck } from "./radarCheck";
 
-export const getAIInput = (aiRig: Vehicle, playerRig: Vehicle, obstacles: Obstacle[]): { [key: string]: boolean } => {
-    const keys: { [key: string]: boolean } = {
+type InputKeys = { [key: string]: boolean };
+
+export const getAIInput = (
+    gameObject: GameObject,
+    aiRig: Vehicle,
+    playerRig: Vehicle
+): InputKeys => {
+    const keys: InputKeys = {
         ArrowUp: false,
         ArrowDown: false,
         ArrowLeft: false,
         ArrowRight: false,
     };
 
-    // Calculate angle to the player
-    const dx = playerRig.x - aiRig.x;
-    const dy = playerRig.y - aiRig.y;
-    const targetAngle = Math.atan2(dy, dx);
+    const radarAngleOffset = Math.PI / 180 * 25; // 25 degrees in radians
+    const avoidDistance = 50; // Minimum distance to avoid obstacles
+    const stuckThreshold = 0.5; // Velocity threshold to consider the AI stuck
+    const recoveryTime = 60; // Frames before aggressive recovery mode
+    const stuckFrames = aiRig.stuckFrames || 0;
 
-    // Adjust AI's angle to face the player
-    const angleDifference = (targetAngle - aiRig.angle + Math.PI * 2) % (Math.PI * 2);
-    if (angleDifference > 0.1 && angleDifference < Math.PI) {
-        keys.ArrowRight = true;
-    } else if (angleDifference > Math.PI) {
-        keys.ArrowLeft = true;
-    }
+    // Radar checks in three directions
+    const forwardCheck = aiRadarCheck(gameObject, 'ai', 0, 'navigation');
+    const leftCheck = aiRadarCheck(gameObject, 'ai', -radarAngleOffset, 'navigation');
+    const rightCheck = aiRadarCheck(gameObject, 'ai', radarAngleOffset, 'navigation');
 
-    // Predict the next position of the AI
-    const nextPosition = {
-        x: aiRig.x + Math.cos(aiRig.angle) * aiRig.acceleration,
-        y: aiRig.y + Math.sin(aiRig.angle) * aiRig.acceleration,
-        width: aiRig.width,
-        height: aiRig.height,
-        angle: aiRig.angle,
-    };
+    const isForwardClear = !forwardCheck.collision || forwardCheck.distance > avoidDistance;
+    const isLeftClear = !leftCheck.collision || leftCheck.distance > avoidDistance;
+    const isRightClear = !rightCheck.collision || rightCheck.distance > avoidDistance;
 
-    // Check for potential collisions
-    const willCollide = obstacles.some((obstacle: Obstacle) =>
-        isRotatedRectColliding(nextPosition, {
-            x: obstacle.x + obstacle.width / 2,
-            y: obstacle.y + obstacle.height / 2,
-            width: obstacle.width,
-            height: obstacle.height,
-            angle: aiRig.angle,
-        })
-    );
+    // Recovery logic for getting unstuck
+    if (
+        Math.abs(aiRig.velocityX) < stuckThreshold &&
+        Math.abs(aiRig.velocityY) < stuckThreshold
+    ) {
+        aiRig.stuckFrames = (aiRig.stuckFrames || 0) + 1;
 
-    // Ensure the AI never gets closer than 10px to an obstacle
-    const safeDistance = 10;
-    let closeObstacle = false;
-
-    obstacles.forEach((obstacle: Obstacle) => {
-        const distance = Math.sqrt(
-            Math.pow(obstacle.x - aiRig.x, 2) + Math.pow(obstacle.y - aiRig.y, 2)
-        );
-
-        // If an obstacle is within the safe distance, mark it
-        if (distance < safeDistance) {
-            closeObstacle = true;
-        }
-    });
-
-    if (closeObstacle) {
-        // Slow down if close to an obstacle (to avoid a crash)
-        aiRig.velocityX *= 0.5; // Reduce velocity to slow down
-        aiRig.velocityY *= 0.5; // Reduce velocity to slow down
-
-        // Prioritize avoiding the collision
-        keys.ArrowUp = false;
-        keys.ArrowDown = true;
-
-        // Try to move in the opposite direction or adjust angle
-        if (angleDifference < Math.PI) {
-            keys.ArrowRight = true; // Turn right to avoid
-        } else {
-            keys.ArrowLeft = true; // Turn left to avoid
-        }
-
-        // Check if turning results in a collision or staying too close
-        const adjustedPosition = {
-            x: aiRig.x + Math.cos(aiRig.angle + 0.1) * aiRig.acceleration,
-            y: aiRig.y + Math.sin(aiRig.angle + 0.1) * aiRig.acceleration,
-            width: aiRig.width,
-            height: aiRig.height,
-            angle: aiRig.angle + 0.1,
-        };
-
-        const adjustedWillCollide = obstacles.some((obstacle: Obstacle) =>
-            isRotatedRectColliding(adjustedPosition, {
-                x: obstacle.x + obstacle.width / 2,
-                y: obstacle.y + obstacle.height / 2,
-                width: obstacle.width,
-                height: obstacle.height,
-                angle: aiRig.angle,
-            })
-        );
-
-        // If the adjusted position still causes a collision, try to turn further
-        if (adjustedWillCollide) {
-            keys.ArrowLeft = true; // Try turning more if the adjusted position causes a collision
+        // Aggressive recovery logic
+        if (stuckFrames > recoveryTime) {
+            keys.ArrowDown = true; // Reverse
+            if (isLeftClear) {
+                keys.ArrowLeft = true; // Turn left to escape
+            } else if (isRightClear) {
+                keys.ArrowRight = true; // Turn right to escape
+            }
+            return keys;
         }
     } else {
-        // If no collision or close obstacle, move toward the player
-        if (!willCollide) {
-            keys.ArrowUp = true;
-        } else {
-            // If a collision is imminent, prioritize avoiding the obstacle
-            keys.ArrowUp = false;
-            keys.ArrowDown = true;
+        aiRig.stuckFrames = 0; // Reset stuck frames if moving
+    }
 
-            // Adjust angle to navigate around the obstacle
-            if (angleDifference < Math.PI) {
-                keys.ArrowRight = true;
-            } else {
-                keys.ArrowLeft = true;
-            }
+    // Main navigation logic
+    if (isForwardClear) {
+        // Move forward toward the player
+        keys.ArrowUp = true;
+
+        // Calculate angle difference to player
+        const dx = playerRig.x - aiRig.x;
+        const dy = playerRig.y - aiRig.y;
+        const targetAngle = Math.atan2(dy, dx);
+        const angleDifference = (targetAngle - aiRig.angle + Math.PI * 2) % (Math.PI * 2);
+
+        if (angleDifference > 0.1 && angleDifference < Math.PI) {
+            keys.ArrowRight = true;
+        } else if (angleDifference > Math.PI) {
+            keys.ArrowLeft = true;
+        }
+    } else if (isLeftClear) {
+        // If forward blocked, prefer left if clear
+        keys.ArrowLeft = true;
+        keys.ArrowUp = true;
+    } else if (isRightClear) {
+        // If forward and left blocked, prefer right if clear
+        keys.ArrowRight = true;
+        keys.ArrowUp = true;
+    } else {
+        // If all directions blocked, reverse and adjust
+        keys.ArrowDown = true;
+        if (stuckFrames % 2 === 0) {
+            keys.ArrowLeft = true;
+        } else {
+            keys.ArrowRight = true;
         }
     }
 

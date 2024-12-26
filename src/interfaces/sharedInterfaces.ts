@@ -37,6 +37,12 @@ export interface CollisionReport {
     withWhat: string;
 };
 
+export interface AiCollisionReport {
+    collision: boolean;
+    withWhat: string;
+    distance: number;
+};
+
 export interface GameObject {
   vehicles: VehicleWithRole[],
   arena: Obstacle[],
@@ -72,6 +78,8 @@ export interface Vehicle {
     descImg?: string;
     reloadStatus?: number;
     weapons: ArmedWeapon[];
+    stuckFrames: number; // for AI, to help when stuck
+    lastPositions: Coordinates[] // for AI
 };
 
 export interface VehicleWithRole {

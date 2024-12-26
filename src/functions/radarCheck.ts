@@ -1,4 +1,4 @@
-import { CollisionReport, Coordinates, GameObject, Vehicle } from "../interfaces/sharedInterfaces";
+import { AiCollisionReport, CollisionReport, Coordinates, GameObject, Vehicle } from "../interfaces/sharedInterfaces";
 import { isRotatedRectColliding } from "./collisionDetect";
 
 export const radarCheck = (
@@ -117,72 +117,75 @@ export const radarCheck = (
     return radarReport;
 };
 
-/*
-      // Update gameObject.bullets
-      for (let i = gameObject.bullets.length - 1; i >= 0; i--) {
-        const bullet = gameObject.bullets[i];
+export const aiRadarCheck = (
+  gameObject: GameObject,
+  who: 'player' | 'ai',
+  angleFix: number,
+  why: string
+): AiCollisionReport => {
+  const radarRange = 500;
+  const waveSpeed = 20;
+  const waveSize = 20;
 
-        // Move bullet
-        radarWave.x += Math.cos(radarWave.angle) * waveSpeed; // Adjust speed as needed
-        radarWave.y += Math.sin(radarWave.angle) * bullet.speed;
+  // Initialize radarWave based on `who` (player or AI)
+  const radarWave: Coordinates = (() => {
+    const playerRig = gameObject.vehicles.find((v) => v.role === 'player')?.vehicle;
+    const aiRig = gameObject.vehicles.find((v) => v.role === 'ai')?.vehicle;
+    if (who === 'player' && playerRig) {
+      return { x: playerRig.x, y: playerRig.y, angle: playerRig.angle };
+    } else if (who === 'ai' && aiRig) {
+      return { x: aiRig.x, y: aiRig.y, angle: aiRig.angle };
+    } else {
+      throw new Error(`No vehicle found for role: ${who}`);
+    }
+  })();
 
-        // Check collision with player
-        if (
-          bullet.owner === 'ai' &&
-          isRotatedRectColliding(
-            { x: bullet.x - waveSize/2, y: bullet.y - 2.5, width: bullet.size + 3, height: bullet.size + 3, angle: 0 },
-            { x: playerRig.x - playerRig.width / 2, y: playerRig.y - playerRig.height / 2, width: playerRig.width, height: playerRig.height, angle: playerRig.angle }
-          )
-        ) {
-          playerRig.hitPoints -= bullet.damage;
-          gameObject.bullets.splice(i, 1); // Remove the bullet
-          gameObject.hits.push({x: bullet.x,
-                                y: bullet.y,
-                                damage: bullet.damage});
-          continue;
-        }
+  let nearestCollision: AiCollisionReport = {
+    collision: false,
+    withWhat: '',
+    distance: radarRange,
+  };
 
-        // Check collision with AI
-        if (
-          bullet.owner === 'player' &&
-          isRotatedRectColliding(
-            { x: bullet.x - 2.5, y: bullet.y - 2.5, width: bullet.size, height: bullet.size, angle: 0 },
-            { x: aiRig.x - aiRig.width / 2, y: aiRig.y - aiRig.height / 2, width: aiRig.width, height: aiRig.height, angle: aiRig.angle }
-          )
-        ) {
-          aiRig.hitPoints -= bullet.damage;
-          gameObject.bullets.splice(i, 1); // Remove the bullet
-          gameObject.hits.push({x: bullet.x,
-                                y: bullet.y,
-                                damage: bullet.damage});
-          continue;
-        }
+  // Radar sweep loop
+  for (let i = 0; i < radarRange; i += waveSpeed) {
+    radarWave.x += Math.cos(radarWave.angle + angleFix) * waveSpeed;
+    radarWave.y += Math.sin(radarWave.angle + angleFix) * waveSpeed;
 
-        // Check collision with obstacles
-        let bulletHitObstacle: boolean = false;
-        for (const obstacle of obstacles) {
-          if (
-            isRotatedRectColliding(
-              { x: bullet.x - 2.5, y: bullet.y - 2.5, width: 5, height: 5, angle: 0 },
-              { x: obstacle.x + obstacle.width / 2, y: obstacle.y + obstacle.height / 2, width: obstacle.width, height: obstacle.height, angle: obstacle.angle }
-            )
-          ) {
-            gameObject.bullets.splice(i, 1); // Remove the bullet
-            bulletHitObstacle = true;
-            break; // Exit the obstacle loop since the bullet is already removed
-          }
-        }
+    // Check collision with obstacles
+    for (const obstacle of gameObject.arena) {
+      const radarRect = {
+        x: radarWave.x - waveSize / 2,
+        y: radarWave.y - waveSize / 2,
+        width: waveSize,
+        height: waveSize,
+        angle: 0,
+      };
+      const obstacleRect = {
+        x: obstacle.x + obstacle.width / 2,
+        y: obstacle.y + obstacle.height / 2,
+        width: obstacle.width,
+        height: obstacle.height,
+        angle: obstacle.angle,
+      };
 
-        if (bulletHitObstacle) {
-          continue; // Skip further checks if the bullet hit an obstacle
-        }
+      if (isRotatedRectColliding(radarRect, obstacleRect)) {
+        const distanceToCollision = Math.sqrt(
+          Math.pow(radarWave.x - (obstacle.x + obstacle.width / 2), 2) +
+          Math.pow(radarWave.y - (obstacle.y + obstacle.height / 2), 2)
+        );
 
-        // Remove gameObject.bullets that go off-screen
-        if (
-          bullet.x < 0 || bullet.x > canvas.width ||
-          bullet.y < 0 || bullet.y > canvas.height
-        ) {
-          gameObject.bullets.splice(i, 1);
-        }
+        nearestCollision = {
+          collision: true,
+          withWhat: 'obstacle',
+          distance: distanceToCollision,
+        };
+        break;
       }
-*/
+    }
+
+    if (nearestCollision.collision) break;
+  }
+
+  return nearestCollision;
+};
+
