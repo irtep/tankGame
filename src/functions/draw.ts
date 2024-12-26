@@ -102,7 +102,7 @@ const drawTargetingX = (
 
     // Draw the targeting '+'
     const crossSize = 20; // Size of the '+'
-    ctx.strokeStyle = 'blue';
+    ctx.strokeStyle = 'black';
     ctx.lineWidth = 2;
 
     // Vertical line of '+'
@@ -118,19 +118,19 @@ const drawTargetingX = (
     ctx.stroke();
 
     // Draw concentric circles
-    //const circleColors = ['red', 'orange', 'yellow', 'green', 'purple'];
     for (let i = 1; i <= 2; i++) {
         ctx.beginPath();
         ctx.arc(mouseX, mouseY, i * 10, 0, 2 * Math.PI); // Circles with increasing radius
         
         if (i === 1) {
-            mainGunAvailable
+            secondaryGunAvailable
             ? ctx.strokeStyle = 'Chartreuse'
             : ctx.strokeStyle = 'darkRed'
         }
         
         if (i === 2) {
-            secondaryGunAvailable
+            
+            mainGunAvailable
             ? ctx.strokeStyle = 'Chartreuse'
             : ctx.strokeStyle = 'darkRed'
         }

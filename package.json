@@ -1,6 +1,7 @@
 {
-  "name": "drive_or_lose",
-  "version": "0.1.0",
+  "name": "charred_axle_combat",
+  "version": "0.0.1",
+  "homepage": ".",
   "private": true,
   "dependencies": {
     "@emotion/react": "^11.14.0",

@@ -11,6 +11,9 @@ import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
 import { reloadWeapons } from '../functions/reloadWeapons';
 import { radarCheck } from '../functions/radarCheck';
+import { Container, Typography } from '@mui/material';
+import PreMatch from './PreMatch';
+import AfterMatch from './AfterMatch';
 
 interface CanvasProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -18,6 +21,7 @@ interface CanvasProps {
   playerRig: string;
   opponentRig: string;
   setEndOfTheMatch: React.Dispatch<React.SetStateAction<MatchEndState | null>>;
+  endOfTheMatch: MatchEndState | null;
 }
 
 const Canvas: React.FC<CanvasProps> = ({
@@ -25,7 +29,8 @@ const Canvas: React.FC<CanvasProps> = ({
   view,
   playerRig,
   opponentRig,
-  setEndOfTheMatch
+  setEndOfTheMatch,
+  endOfTheMatch
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [message, setMessage] = useState<string>('');
@@ -138,7 +143,7 @@ const Canvas: React.FC<CanvasProps> = ({
       updateRigMovement(aiRig, aiKeys, obstacles, playerRig, deceleration);
 
       // AI shoots
-      
+
       if (aiRig.weapons[0].cooldown === 0) {
 
         const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
@@ -148,7 +153,7 @@ const Canvas: React.FC<CanvasProps> = ({
           0,
           'check for front weapons'
         );
-        shoot(aiRig, gameObject, angle, checkingRadar, false);    
+        shoot(aiRig, gameObject, angle, checkingRadar, false);
       }
 
       // Update gameObject.bullets
@@ -229,8 +234,8 @@ const Canvas: React.FC<CanvasProps> = ({
         console.log('0 hp');
         const winner =
           gameObject.vehicles.find(v => v.vehicle.hitPoints > 0)?.role === 'player'
-            ? 'Player Wins!'
-            : 'AI Wins!';
+            ? 'You won, greatly played!'
+            : 'You lost, better luck next time!';
         setMessage(winner);
         setView('afterBattle');
         // Render final state directly here
@@ -284,30 +289,44 @@ const Canvas: React.FC<CanvasProps> = ({
   }, [view]);
 
   return (
-    <div>
-      <div style={{ marginTop: '10px', fontSize: '16px', fontWeight: 'bold' }}>
-        {view === 'preBattle' && (
-          <button onClick={() => setView('battle')}>Click this to start the battle</button>
-        )}
-        {view === 'afterBattle' && (
+    <Container>
+      {
+        view === 'battle' && (
           <>
-            {message}
-            <button onClick={() => setView('battle')}>Play again</button>
-            <button onClick={() => setView('menu')}>Back to menu</button>
+            <canvas
+              ref={canvasRef}
+              style={{
+                position: 'absolute',
+                border: '1px solid black',
+                background: '#9A7B4D',
+                marginLeft: 0,
+                marginRight: 0,
+              }}
+            />
+          </>)
+      }
+      {
+        view === 'preBattle' && (
+          <Container>
+            <PreMatch
+              setView={setView}
+            />
+          </Container>
+        )
+      }
+      {
+        view === 'afterBattle' && (
+          <>
+            <AfterMatch
+              setView={setView}
+              message={message}
+              endOfTheMatch={endOfTheMatch}
+            />
           </>
-        )}
-      </div>
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'absolute',
-          border: '1px solid black',
-          background: '#9A7B4D',
-          marginLeft: 0,
-          marginRight: 0,
-        }}
-      />
-    </div>
+        )
+      }
+
+    </Container>
   );
 };
 

@@ -1,5 +1,5 @@
 import { weapons } from "../constants/weapons";
-import { ArmedWeapon, Bullet, CollisionReport, Coordinates, GameObject, Vehicle, VehicleWithRole, Weapon } from "../interfaces/sharedInterfaces";
+import { ArmedWeapon, Bullet, CollisionReport, Coordinates, GameObject, Vehicle, Weapon } from "../interfaces/sharedInterfaces";
 
 function getRandomNumber(max: number): number {
     if (max < 0) {
@@ -63,28 +63,41 @@ export const fireWeapon = (
         let angleOffset: number = 0;
 
         if (weapon.specials.includes('suppressing')) {
-            repeatingTimes = 4
+            repeatingTimes = 4;
             spread = 10;
             angleOffset = 50;
+
+            for (let i = 0; i < repeatingTimes; i++) {
+                bullets.push(createBullet(
+                    from.x + (getRandomNumber(spread)),
+                    from.y + (getRandomNumber(spread)),
+                    from.angle + (i / angleOffset),
+                    owner,
+                    weapon.color,
+                    weapon.bulletSize,
+                    weapon.damage,
+                    weapon.speed
+                ));
+            }
         }
         if (weapon.specials.includes('point blank')) {
-            repeatingTimes = 3
-            spread = 20;
-            angleOffset = 40;
+            repeatingTimes = 4
+
+            for (let i = 0; i < repeatingTimes; i++) {
+                bullets.push(createBullet(
+                    from.x,
+                    from.y - 15 + (i*7),
+                    from.angle,
+                    owner,
+                    weapon.color,
+                    weapon.bulletSize,
+                    weapon.damage,
+                    weapon.speed
+                ));
+            }
         }
 
-        for (let i = 0; i < repeatingTimes; i++) {
-            bullets.push(createBullet(
-                from.x + (getRandomNumber(spread)),
-                from.y + (getRandomNumber(spread)),
-                from.angle + (i / angleOffset),
-                owner,
-                weapon.color,
-                weapon.bulletSize,
-                weapon.damage,
-                weapon.speed
-            ));
-        }
+
     }
 
     return bullets;

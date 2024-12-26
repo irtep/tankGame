@@ -3,6 +3,7 @@ import { Box, Button, MenuItem, Select } from '@mui/material';
 import { Vehicle } from '../interfaces/sharedInterfaces';
 import { rigs } from '../constants/rigs';
 import { getRigByName } from '../functions/utils';
+import Footer from './Footer';
 
 interface MenuProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -13,18 +14,25 @@ interface MenuProps {
 };
 
 const Menu: React.FC<MenuProps> = ({
-    setView, 
-    playerRig,
-    opponentRig,
-    setPlayerRig,
-    setOpponentRig
-  }) => {
-    
+  setView,
+  playerRig,
+  opponentRig,
+  setPlayerRig,
+  setOpponentRig
+}) => {
+
   const pRig = getRigByName(playerRig);
   const oRig = getRigByName(opponentRig);
 
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'row', gap: 2, p: 3 }}>
+    <Box sx={{
+      display: 'flex',
+      flexDirection: 'row',
+      gap: 2,
+      p: 3,
+      background: 'black',
+      color: 'red'
+    }}>
       {/* Left Column: Form */}
       <Box
         sx={{
@@ -38,7 +46,11 @@ const Menu: React.FC<MenuProps> = ({
         <Select
           value={playerRig}
           onChange={(e) => setPlayerRig(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ 
+            mb: 2,
+            background: 'gray',
+            color: 'white'
+          }}
         >
           {rigs.map((rig: Vehicle, i: number) => (
             <MenuItem key={`pRig ${i}`} value={rig.name}>
@@ -51,15 +63,29 @@ const Menu: React.FC<MenuProps> = ({
         <Select
           value={opponentRig}
           onChange={(e) => setOpponentRig(e.target.value)}
-          sx={{ mb: 2 }}
+          sx={{ 
+            mb: 2,
+            background: 'gray',
+            color: 'white'
+          }}
         >
           {rigs.map((rig: Vehicle, i: number) => (
-            <MenuItem key={`oRig ${i}`} value={rig.name}>
+            <MenuItem 
+              key={`oRig ${i}`}
+              value={rig.name}
+              sx={{
+                borderColor: 'red'
+              }}
+              >
               {rig.name}
             </MenuItem>
           ))}
         </Select>
         <Button
+          sx={{
+            background: 'red',
+            color: 'black'
+          }}
           onClick={() => {
             setView('preBattle');
           }}
@@ -99,6 +125,7 @@ const Menu: React.FC<MenuProps> = ({
           )}
         </Box>
       </Box>
+      <Footer />
     </Box>
   );
 };

@@ -38,6 +38,7 @@ const App: React.FC = (): React.ReactElement => {
             playerRig={playerRig}
             opponentRig={opponentRig}
             setEndOfTheMatch={setEndOfTheMatch}
+            endOfTheMatch={endOfTheMatch}
           />
         </> : <></>
       }
