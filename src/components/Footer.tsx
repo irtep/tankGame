@@ -16,7 +16,7 @@ const Footer: React.FC = (): React.ReactElement => {
         padding: 1
       }}>
         <Typography>
-          Version: Test: 0.0.1
+          Version: Test: 0.0.4
         </Typography>
       </Container>
     );

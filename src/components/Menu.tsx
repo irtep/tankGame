@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Box, Button, MenuItem, Select } from '@mui/material';
 import { Vehicle } from '../interfaces/sharedInterfaces';
 import { rigs } from '../constants/rigs';
 import { getRigByName } from '../functions/utils';
 import Footer from './Footer';
+import DescOfRig from './DescOfRig';
 
 interface MenuProps {
   setView: React.Dispatch<React.SetStateAction<'menu' | 'battle' | 'preBattle' | 'afterBattle'>>;
@@ -21,8 +22,8 @@ const Menu: React.FC<MenuProps> = ({
   setOpponentRig
 }) => {
 
-  const pRig = getRigByName(playerRig);
-  const oRig = getRigByName(opponentRig);
+  const pRig: Vehicle | undefined = getRigByName(playerRig);
+  const oRig: Vehicle | undefined = getRigByName(opponentRig);
 
   return (
     <Box sx={{
@@ -103,26 +104,16 @@ const Menu: React.FC<MenuProps> = ({
         }}
       >
         <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>{playerRig}</h4>
-          <p>{pRig?.desc}</p>
-          {pRig?.descImg && (
-            <img
-              src={`/img/${pRig?.descImg}`}
-              alt={`${pRig.name} description`}
-              style={{ maxWidth: '200px' }}
-            />
-          )}
+          <DescOfRig
+            rigOfWho={playerRig}
+            rig={pRig}
+          />
         </Box>
         <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-          <h4>{opponentRig}</h4>
-          <p>{oRig?.desc}</p>
-          {oRig?.descImg && (
-            <img
-              src={`/img/${oRig?.descImg}`}
-              alt={`${oRig.name} description`}
-              style={{ maxWidth: '200px' }}
-            />
-          )}
+        <DescOfRig
+            rigOfWho={opponentRig}
+            rig={oRig}
+          />
         </Box>
       </Box>
       <Footer />

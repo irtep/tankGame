@@ -2,9 +2,5 @@
 
 WORK IN PROCESS
 
-# to dev and bugs:
--secondary guns fire from wrong location
--could make point blank so, that shoots in same line
--charred axle them colors
--sounds effects
--after battle view
+# can test current version at:
+https://amorcitos.cyou/charred/
