@@ -47,7 +47,7 @@ const Menu: React.FC<MenuProps> = ({
         <Select
           value={playerRig}
           onChange={(e) => setPlayerRig(e.target.value)}
-          sx={{ 
+          sx={{
             mb: 2,
             background: 'gray',
             color: 'white'
@@ -64,20 +64,20 @@ const Menu: React.FC<MenuProps> = ({
         <Select
           value={opponentRig}
           onChange={(e) => setOpponentRig(e.target.value)}
-          sx={{ 
+          sx={{
             mb: 2,
             background: 'gray',
             color: 'white'
           }}
         >
           {rigs.map((rig: Vehicle, i: number) => (
-            <MenuItem 
+            <MenuItem
               key={`oRig ${i}`}
               value={rig.name}
               sx={{
                 borderColor: 'red'
               }}
-              >
+            >
               {rig.name}
             </MenuItem>
           ))}
@@ -110,7 +110,7 @@ const Menu: React.FC<MenuProps> = ({
           />
         </Box>
         <Box sx={{ border: '1px solid #ccc', p: 2 }}>
-        <DescOfRig
+          <DescOfRig
             rigOfWho={opponentRig}
             rig={oRig}
           />

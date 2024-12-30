@@ -51,7 +51,7 @@ export const weapons: Weapon[] = [
         turret: true,
         damage: 1,
         impactPower: 4,
-        cooldown: 100,
+        cooldown: 200,
         specials: ['point blank'],
         cost: 1,
         costInSpeed: 1,

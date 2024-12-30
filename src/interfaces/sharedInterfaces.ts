@@ -1,4 +1,5 @@
 export interface Obstacle {
+    img: string; // use png's
     x: number;
     y: number;
     angle: number;

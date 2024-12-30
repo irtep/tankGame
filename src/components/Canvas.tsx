@@ -66,7 +66,7 @@ const Canvas: React.FC<CanvasProps> = ({
       // gives vehicles selected values
       gameObject.vehicles[0].vehicle = {
         ...pRig,
-        x: 600,
+        x: 700,
         y: 500,
         velocityX: 0,
         velocityY: 0
@@ -298,7 +298,10 @@ const Canvas: React.FC<CanvasProps> = ({
               style={{
                 position: 'absolute',
                 border: '1px solid black',
-                background: '#9A7B4D',
+                //background: '#9A7B4D',
+                backgroundImage: `url(${process.env.PUBLIC_URL}/img/desert1.png)`,
+                backgroundSize: 'cover', // Or 'contain', '100% 100%' for specific sizing
+                backgroundRepeat: 'no-repeat', // Avoid tiling the image
                 marginLeft: 0,
                 marginRight: 0,
               }}

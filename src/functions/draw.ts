@@ -1,4 +1,4 @@
-import { ArmedWeapon, Bullet, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
+import { ArmedWeapon, Bullet, Obstacle, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
 import { obstacles } from "../constants/obstacles";
 import { Hit } from "../interfaces/sharedInterfaces";
 
@@ -39,6 +39,45 @@ const drawExplosion = (
     ctx.fill();
 }
 
+const drawObstacle = (ctx: CanvasRenderingContext2D, obstacle: Obstacle) => {
+    const imgKey = obstacle.img;
+    if (imgKey/* && obstacle.img !== 'wall'*/) {
+        if (!imageCache[imgKey]) {
+            const img = new Image();
+            img.onload = () => {
+                imageCache[imgKey] = img;
+            };
+            img.onerror = (error) => {
+                console.error('Error loading image:', error, img.src);
+            };
+            img.src = process.env.PUBLIC_URL + `/img/${imgKey}.png`;
+        }
+
+        const img = imageCache[imgKey];
+        if (img?.complete) {
+            ctx.save();
+            ctx.translate(obstacle.x, obstacle.y);
+            ctx.rotate(obstacle.angle);
+            ctx.drawImage(img, 0, 0, obstacle.width, obstacle.height);
+            ctx.restore();
+        } else {
+            ctx.save();
+            ctx.translate(obstacle.x, obstacle.y);
+            ctx.rotate(obstacle.angle);
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, obstacle.width, obstacle.height);
+            ctx.restore();
+        }
+    } else {
+        ctx.save();
+        ctx.translate(obstacle.x, obstacle.y);
+        ctx.rotate(obstacle.angle);
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, obstacle.width, obstacle.height);
+        ctx.restore();
+    }
+};
+
 const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
     const imgKey = vehicle.battleImg;
     if (imgKey) {
@@ -62,7 +101,7 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
         }
     } else {
         // backup to draw just a box
-        console.log('drawing backup');
+        //console.log('drawing backup');
         ctx.save();
         ctx.translate(vehicle.x, vehicle.y);
         ctx.rotate(vehicle.angle);
@@ -91,14 +130,11 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
 
 const drawTargetingX = (
     ctx: CanvasRenderingContext2D,
-    canvas: HTMLCanvasElement,
     mouseX: number,
     mouseY: number,
     mainGunAvailable: boolean,
     secondaryGunAvailable: boolean
 ) => {
-    // Clear the canvas
-    //ctx.clearRect(0, 0, canvas.width, canvas.height);
 
     // Draw the targeting '+'
     const crossSize = 20; // Size of the '+'
@@ -121,20 +157,20 @@ const drawTargetingX = (
     for (let i = 1; i <= 2; i++) {
         ctx.beginPath();
         ctx.arc(mouseX, mouseY, i * 10, 0, 2 * Math.PI); // Circles with increasing radius
-        
+
         if (i === 1) {
             secondaryGunAvailable
-            ? ctx.strokeStyle = 'Chartreuse'
-            : ctx.strokeStyle = 'darkRed'
+                ? ctx.strokeStyle = 'Chartreuse'
+                : ctx.strokeStyle = 'darkRed'
         }
-        
+
         if (i === 2) {
-            
+
             mainGunAvailable
-            ? ctx.strokeStyle = 'Chartreuse'
-            : ctx.strokeStyle = 'darkRed'
+                ? ctx.strokeStyle = 'Chartreuse'
+                : ctx.strokeStyle = 'darkRed'
         }
-        
+
         ctx.stroke();
     }
 };
@@ -153,7 +189,7 @@ const draw = (
     let mainGunAvailable = false;
     let secondaryGunAvailable = false;
 
-    rigs[0].weapons.forEach( (w: ArmedWeapon, i: number) => {
+    rigs[0].weapons.forEach((w: ArmedWeapon, i: number) => {
         // 0 is main gun
         if (
             i === 0 &&
@@ -175,9 +211,8 @@ const draw = (
     });
 
     // Draw obstacles
-    ctx.fillStyle = 'gray';
-    obstacles.forEach((obstacle) => {
-        ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+    obstacles.forEach((rig: Obstacle) => {
+        drawObstacle(ctx, rig);
     });
 
     // Draw bullets
@@ -197,7 +232,6 @@ const draw = (
     // draw targeting x
     drawTargetingX(
         ctx,
-        canvas,
         mouseNowX,
         mouseNowY,
         mainGunAvailable,

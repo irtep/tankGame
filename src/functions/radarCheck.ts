@@ -87,7 +87,7 @@ export const radarCheck = (
                     */
                     radarReport.collision = true;
                     radarReport.withWhat = 'player'
-                    console.log('player found by radar');
+                    //console.log('player found by radar');
                     break;
                 }
 
