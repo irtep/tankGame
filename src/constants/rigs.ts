@@ -40,7 +40,10 @@ export const rigs: Vehicle[] = [
             }
         ],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     {
         name: 'Amazonas',
@@ -93,7 +96,10 @@ export const rigs: Vehicle[] = [
             },
         ],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     {
         name: 'Leprechaun',
@@ -134,7 +140,10 @@ export const rigs: Vehicle[] = [
             },
         ],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     {
         name: 'Ice',
@@ -175,7 +184,10 @@ export const rigs: Vehicle[] = [
             },
         ],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     {
         name: 'Starblade',
@@ -216,7 +228,10 @@ export const rigs: Vehicle[] = [
             }
         ],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     }
 ];
 
@@ -237,7 +252,10 @@ export const placeHolder1: VehicleWithRole = {
         hitPoints: 9,
         weapons: [],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     role: 'player',
 }
@@ -259,7 +277,10 @@ export const placeHolder2: VehicleWithRole = {
         hitPoints: 9,
         weapons: [],
         stuckFrames: 0,
-        lastPositions: []
+/*        lastPositions: [],
+        wasShot: false,
+        evasionFrames: '',
+        cornerFrames: ''*/
     },
     role: 'ai',
 }

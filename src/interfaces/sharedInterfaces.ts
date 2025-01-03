@@ -80,7 +80,10 @@ export interface Vehicle {
     reloadStatus?: number;
     weapons: ArmedWeapon[];
     stuckFrames: number; // for AI, to help when stuck
-    lastPositions: Coordinates[] // for AI
+    //lastPositions: Coordinates[] // for AI
+    //evasionFrames: any; // for AI
+    //wasShot: boolean;  // for AI
+    //cornerFrames: any; // AI
 };
 
 export interface VehicleWithRole {

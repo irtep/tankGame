@@ -3,7 +3,7 @@ import { Weapon } from "../interfaces/sharedInterfaces";
 export const weapons: Weapon[] = [
     {
         name: 'rattler',
-        type: 'shell',
+        type: 'shellBurst',
         color: 'black',
         bulletSize: 2,
         turret: true,
@@ -45,13 +45,13 @@ export const weapons: Weapon[] = [
     },
     {
         name: 'vanguard',
-        type: 'shell',
+        type: 'shellBurst',
         color: 'black',
         bulletSize: 2,
         turret: true,
         damage: 1,
         impactPower: 4,
-        cooldown: 200,
+        cooldown: 350,
         specials: ['point blank'],
         cost: 1,
         costInSpeed: 1,

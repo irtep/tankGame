@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import draw from '../functions/draw';
 import { arenaHeight, arenaWidth, deceleration } from '../constants/measures';
 import { obstacles } from '../constants/obstacles';
-import { CollisionReport, GameObject, MatchEndState, Vehicle } from '../interfaces/sharedInterfaces';
-import { getRigByName } from '../functions/utils';
+import { GameObject, MatchEndState, Vehicle } from '../interfaces/sharedInterfaces';
+import { getRigByName, playSound } from '../functions/utils';
 import { isRotatedRectColliding } from '../functions/collisionDetect';
 import { shoot } from '../functions/fireWeapon';
 import { placeHolder1, placeHolder2 } from '../constants/rigs';
@@ -11,7 +11,7 @@ import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
 import { reloadWeapons } from '../functions/reloadWeapons';
 import { radarCheck } from '../functions/radarCheck';
-import { Container, Typography } from '@mui/material';
+import { Container } from '@mui/material';
 import PreMatch from './PreMatch';
 import AfterMatch from './AfterMatch';
 
@@ -111,14 +111,35 @@ const Canvas: React.FC<CanvasProps> = ({
 
       // player shooting:
       if (playerRig && aiRig) {
-        const turretsAngle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        //const turretsAngle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        //
+        // Calculate the angle to the mouse position
+        const mouseAngle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        const forwardAngle: number = playerRig.angle;
+
+        // Define the arc range (±π/8 radians for a 45-degree arc)
+        const arcRange: number = Math.PI / 8;
+
+        // Normalize angles to [0, 2π] for comparison
+        const normalizeAngle = (angle: number) => (angle + Math.PI * 2) % (Math.PI * 2);
+        const normalizedMouseAngle = normalizeAngle(mouseAngle);
+        const normalizedForwardAngle = normalizeAngle(forwardAngle);
+
+        // Check if the mouse is within the front arc
+        const isInFrontArc =
+          Math.abs(normalizedMouseAngle - normalizedForwardAngle) <= arcRange ||
+          Math.abs(normalizedMouseAngle - normalizedForwardAngle - Math.PI * 2) <= arcRange;
+        //        
+        //console.log('in front: ', isInFrontArc);
+        /*
         const checkingRadar: CollisionReport = radarCheck(
           gameObject,
           'player',
           0,
           'check for front weapons'
         );
-        shoot(playerRig, gameObject, turretsAngle, checkingRadar, true);
+        */
+        shoot(playerRig, gameObject, mouseAngle, isInFrontArc/*checkingRadar*/, true);
       }
     };
 
@@ -147,13 +168,34 @@ const Canvas: React.FC<CanvasProps> = ({
       if (aiRig.weapons[0].cooldown === 0) {
 
         const angle: number = Math.atan2(playerRig.y - aiRig.y, playerRig.x - aiRig.x);
+
+        // Calculate the angle to the mouse position
+        //const mouseAngle: number = Math.atan2(mouseY - playerRig.y, mouseX - playerRig.x);
+        const forwardAngle: number = aiRig.angle;
+
+        // Define the arc range (±π/8 radians for a 45-degree arc)
+        const arcRange: number = Math.PI / 8;
+
+        // Normalize angles to [0, 2π] for comparison
+        const normalizeAngle = (angle: number) => (angle + Math.PI * 2) % (Math.PI * 2);
+        const normalizedShootingAngle = normalizeAngle(angle);
+        const normalizedForwardAngle = normalizeAngle(forwardAngle);
+
+        // Check if the mouse is within the front arc
+        const isInFrontArc =
+          Math.abs(normalizedShootingAngle - normalizedForwardAngle) <= arcRange ||
+          Math.abs(normalizedShootingAngle - normalizedForwardAngle - Math.PI * 2) <= arcRange;
+        //        
+        //console.log('in front (ai): ', isInFrontArc);
+        /*
         const checkingRadar: CollisionReport = radarCheck(
           gameObject,
           'ai',
           0,
           'check for front weapons'
         );
-        shoot(aiRig, gameObject, angle, checkingRadar, false);
+        */
+        shoot(aiRig, gameObject, angle, isInFrontArc/*checkingRadar*/, false);
       }
 
       // Update gameObject.bullets
@@ -179,6 +221,11 @@ const Canvas: React.FC<CanvasProps> = ({
             y: bullet.y,
             damage: bullet.damage
           });
+          if (bullet.size > 2) {
+            playSound('explosion');
+          } else {
+            playSound('clash');
+          }
           continue;
         }
 
@@ -197,6 +244,11 @@ const Canvas: React.FC<CanvasProps> = ({
             y: bullet.y,
             damage: bullet.damage
           });
+          if (bullet.size > 2) {
+            playSound('explosion');
+          } else {
+            playSound('clash');
+          }
           continue;
         }
 
