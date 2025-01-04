@@ -84,6 +84,8 @@ export interface Vehicle {
     //evasionFrames: any; // for AI
     //wasShot: boolean;  // for AI
     //cornerFrames: any; // AI
+    path: { col: number; row: number; }[];
+    currentTargetIndex: number;
 };
 
 export interface VehicleWithRole {

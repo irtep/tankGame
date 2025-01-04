@@ -44,6 +44,8 @@ export const rigs: Vehicle[] = [
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     {
         name: 'Amazonas',
@@ -100,6 +102,8 @@ export const rigs: Vehicle[] = [
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     {
         name: 'Leprechaun',
@@ -144,6 +148,8 @@ export const rigs: Vehicle[] = [
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     {
         name: 'Ice',
@@ -188,6 +194,8 @@ export const rigs: Vehicle[] = [
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     {
         name: 'Starblade',
@@ -232,6 +240,8 @@ export const rigs: Vehicle[] = [
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     }
 ];
 
@@ -256,6 +266,8 @@ export const placeHolder1: VehicleWithRole = {
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     role: 'player',
 }
@@ -281,6 +293,8 @@ export const placeHolder2: VehicleWithRole = {
         wasShot: false,
         evasionFrames: '',
         cornerFrames: ''*/
+        path: [],
+        currentTargetIndex: 0
     },
     role: 'ai',
 }
