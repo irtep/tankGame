@@ -39,13 +39,7 @@ export const rigs: Vehicle[] = [
                 offsetY: 15
             }
         ],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     {
         name: 'Amazonas',
@@ -97,13 +91,7 @@ export const rigs: Vehicle[] = [
                 offsetY: 15
             },
         ],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     {
         name: 'Leprechaun',
@@ -143,13 +131,7 @@ export const rigs: Vehicle[] = [
                 offsetY: 25
             },
         ],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     {
         name: 'Ice',
@@ -189,13 +171,7 @@ export const rigs: Vehicle[] = [
                 offsetY: 10
             },
         ],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     {
         name: 'Starblade',
@@ -235,13 +211,7 @@ export const rigs: Vehicle[] = [
                 offsetY: 15
             }
         ],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     }
 ];
 
@@ -261,13 +231,7 @@ export const placeHolder1: VehicleWithRole = {
         armour: 0,
         hitPoints: 9,
         weapons: [],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     role: 'player',
 }
@@ -288,13 +252,7 @@ export const placeHolder2: VehicleWithRole = {
         armour: 0,
         hitPoints: 9,
         weapons: [],
-        stuckFrames: 0,
-/*        lastPositions: [],
-        wasShot: false,
-        evasionFrames: '',
-        cornerFrames: ''*/
-        path: [],
-        currentTargetIndex: 0
+        path: {x: 0, y: 0, reached: false},
     },
     role: 'ai',
 }

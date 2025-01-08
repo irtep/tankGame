@@ -10,7 +10,7 @@ import { placeHolder1, placeHolder2 } from '../constants/rigs';
 import { updateRigMovement } from '../functions/updateRigMovement';
 import { getAIInput } from '../functions/aiFunctions';
 import { reloadWeapons } from '../functions/reloadWeapons';
-import { radarCheck } from '../functions/radarCheck';
+//import { radarCheck } from '../functions/radarCheck';
 import { Container } from '@mui/material';
 import PreMatch from './PreMatch';
 import AfterMatch from './AfterMatch';

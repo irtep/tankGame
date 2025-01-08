@@ -1,4 +1,4 @@
-import { ArmedWeapon, Bullet, Obstacle, RadarImage, Vehicle } from "../interfaces/sharedInterfaces";
+import { ArmedWeapon, Bullet, Obstacle,Vehicle } from "../interfaces/sharedInterfaces";
 import { obstacles } from "../constants/obstacles";
 import { Hit } from "../interfaces/sharedInterfaces";
 
@@ -126,6 +126,11 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
         ctx.fillText(JSON.stringify(w.name), vehicle.x + 10, vehicle.y + 35 + (11 * i));
     });
 
+    // if ai rig, can enable this to check its next path
+    if (vehicle.path.x !== 0) {
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(vehicle.path.x, vehicle.path.y, 60, 60);
+    }
 }
 
 const drawTargetingX = (
@@ -181,7 +186,7 @@ const draw = (
     rigs: Vehicle[],
     hits: Hit[],
     bullets: Bullet[],
-    radars: RadarImage[],
+    radars: Vehicle[],
     mouseNowX: number,
     mouseNowY: number
 ) => {
@@ -240,14 +245,20 @@ const draw = (
 
     // radar images for debug reasons, if needed
     // need to activate too from radarCheck that push
-    /*
-    radars.forEach((radarWave: RadarImage) => {
-        ctx.fillStyle = 'darkRed';
-        ctx.beginPath();
-        ctx.arc(radarWave.x, radarWave.y, 5, 0, Math.PI * 2);
-        ctx.fill();
+    //console.log('aiRig: ', rigs[1].x, rigs[1].y, rigs[1].angle);
+    radars.forEach((radarWave: Vehicle, i: number) => {
+        //console.log('radarWave: ', radarWave.x, radarWave.y, radarWave.angle);
+        ctx.save();
+        ctx.translate(radarWave.x, radarWave.y);
+        ctx.rotate(radarWave.angle);
+        ctx.strokeStyle = 'black';
+        ctx.strokeRect(-radarWave.width / 2, -radarWave.height / 2, radarWave.width, radarWave.height);
+        ctx.font = '14px Arial';
+        ctx.fillStyle = 'black';
+        ctx.fillText(JSON.stringify(i), radarWave.width / 2, radarWave.height / 2);        
+        ctx.restore();
     });
-    */
 };
+
 
 export default draw;

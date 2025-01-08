@@ -32,8 +32,8 @@ export const updateRigMovement = (
     keys: { [key: string]: boolean },
     obstacles: Obstacle[],
     otherRig: Vehicle,
-    deceleration: number
-) => {
+    deceleration: number ) => {
+
     // Update movement based on input keys
     if (keys.ArrowUp || keys.w) {
         rig.velocityX += Math.cos(rig.angle) * rig.acceleration;
@@ -109,17 +109,19 @@ if (keys.ArrowRight || keys.d) {
 }
 
 export const returnMovementTest = (
+    range: number,
     rig: Vehicle,
     keys: { [key: string]: boolean },
     obstacles: Obstacle[],
     otherRig: Vehicle,
-    deceleration: number
-): Vehicle => {
+    deceleration: number ): Vehicle => {
+
     // Update movement based on input keys
-    if (keys.ArrowUp || keys.w) {
-        rig.velocityX += Math.cos(rig.angle) * rig.acceleration;
-        rig.velocityY += Math.sin(rig.angle) * rig.acceleration;
-    }
+    //if (keys.ArrowUp || keys.w) {
+        rig.velocityX += Math.cos(rig.angle) * range;
+        rig.velocityY += Math.sin(rig.angle) * range;
+    //}
+    /*
     if (keys.ArrowDown || keys.s) {
         if (rig.type === 'tank') {
             rig.velocityX -= Math.cos(rig.angle) * rig.acceleration;
@@ -129,8 +131,9 @@ export const returnMovementTest = (
             rig.velocityY -= Math.sin(rig.angle) * 0.1;
         }
     }
-
+    */
     // Apply friction (deceleration)
+    /*
     if (!keys.ArrowUp &&
         !keys.ArrowDown &&
         !keys.w &&
@@ -139,26 +142,27 @@ export const returnMovementTest = (
         rig.velocityX *= 1 - deceleration;
         rig.velocityY *= 1 - deceleration;
     }
-
+    */
     // Cap the speed to maxSpeed
+    /*
     const speed = Math.sqrt(rig.velocityX ** 2 + rig.velocityY ** 2);
     if (speed > rig.speed) {
         const scale = rig.speed / speed;
         rig.velocityX *= scale;
         rig.velocityY *= scale;
     }
-
+    */
 // Only change the angle if the new angle doesn't cause a collision
 if (keys.ArrowLeft || keys.a) {
-    if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
+//    if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
         rig.angle -= 0.05;
-    }
+//    }
 }
 
 if (keys.ArrowRight || keys.d) {
-    if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
+ //   if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
         rig.angle += 0.05;
-    }
+//    }
 }
 
     // Calculate the next position
@@ -189,7 +193,7 @@ if (keys.ArrowRight || keys.d) {
         rig.velocityY = 0;
     }*/
 
-    return rig;
+    return nextRig;
 }
 
 export const movementCollisionTest = (
@@ -204,8 +208,8 @@ export const movementCollisionTest = (
 
     // Update movement based on input keys
     if (keys.ArrowUp || keys.w) {
-        rig.velocityX += Math.cos(rig.angle) * rig.acceleration;
-        rig.velocityY += Math.sin(rig.angle) * rig.acceleration;
+        rig.velocityX += Math.cos(rig.angle) * rig.acceleration + 10;
+        rig.velocityY += Math.sin(rig.angle) * rig.acceleration + 10;
     }
     if (keys.ArrowDown || keys.s) {
         if (rig.type === 'tank') {
@@ -218,6 +222,7 @@ export const movementCollisionTest = (
     }
 
     // Apply friction (deceleration)
+    /*
     if (!keys.ArrowUp &&
         !keys.ArrowDown &&
         !keys.w &&
@@ -226,7 +231,7 @@ export const movementCollisionTest = (
         rig.velocityX *= 1 - deceleration;
         rig.velocityY *= 1 - deceleration;
     }
-
+    */
     // Cap the speed to maxSpeed
     /*
     const speed = Math.sqrt(rig.velocityX ** 2 + rig.velocityY ** 2);

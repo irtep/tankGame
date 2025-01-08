@@ -16,6 +16,7 @@ export interface Hit {
 export interface RadarImage {
     x: number;
     y: number;
+    a: number;
 };
 
 export interface ArmedWeapon {
@@ -50,7 +51,7 @@ export interface GameObject {
   hits: Hit[],
   bullets: Bullet[],
   updateCounter: number;
-  radars: RadarImage[],
+  radars: Vehicle[],
   mouseNowX: number,
   mouseNowY: number
 };
@@ -59,6 +60,12 @@ export interface MatchEndState {
   winner: string;
   gameObject: GameObject
 }
+
+export interface PathTarget {
+    x: number;
+    y: number;
+    reached: boolean;
+};
 
 export interface Vehicle {
     name: string;
@@ -79,13 +86,7 @@ export interface Vehicle {
     descImg?: string;
     reloadStatus?: number;
     weapons: ArmedWeapon[];
-    stuckFrames: number; // for AI, to help when stuck
-    //lastPositions: Coordinates[] // for AI
-    //evasionFrames: any; // for AI
-    //wasShot: boolean;  // for AI
-    //cornerFrames: any; // AI
-    path: { col: number; row: number; }[];
-    currentTargetIndex: number;
+    path: PathTarget;
 };
 
 export interface VehicleWithRole {
