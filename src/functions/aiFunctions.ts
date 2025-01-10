@@ -71,7 +71,7 @@ export const getAIInput = (
                     ob
                 )
                 if (collisionWithThis) {
-                    console.log(true);
+                    //console.log(true);
                     collisionResultInLoop = true;
                     return;
                 } else {
@@ -88,9 +88,10 @@ export const getAIInput = (
     // check what movement would take you to closest to target
     // radar images
     const forwardRadarImages = returnMovementTest(
-        30,
+        27,
         {
             ...aiRig,
+            width: 70
         },
         testKey[0],
         gameObject.arena,
@@ -98,7 +99,7 @@ export const getAIInput = (
         deceleration
     );
     const turnLeftRadarImages = returnMovementTest(
-        22,
+        25,
         {
             ...aiRig,
             angle: aiRig.angle - 0.5
@@ -109,10 +110,44 @@ export const getAIInput = (
         deceleration
     );
     const turnRightRadarImages = returnMovementTest(
-        22,
+        25,
         {
             ...aiRig,
             angle: aiRig.angle + 0.5
+        },
+        testKey[2],
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
+    // reverse tests:
+    const reverseRadarImages = returnMovementTest(
+        -22,
+        {
+            ...aiRig,
+            angle: aiRig.angle
+        },
+        testKey[0],
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
+    const reverseLeftRadarImages = returnMovementTest(
+        -10,
+        {
+            ...aiRig,
+            angle: aiRig.angle - 0.3
+        },
+        testKey[1],
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
+    const reverseRightRadarImages = returnMovementTest(
+        -10,
+        {
+            ...aiRig,
+            angle: aiRig.angle + 0.3
         },
         testKey[2],
         gameObject.arena,
@@ -124,6 +159,9 @@ export const getAIInput = (
     gameObject.radars.push(forwardRadarImages);
     gameObject.radars.push(turnLeftRadarImages);
     gameObject.radars.push(turnRightRadarImages);
+    gameObject.radars.push(reverseRadarImages);
+    gameObject.radars.push(reverseLeftRadarImages);
+    gameObject.radars.push(reverseRightRadarImages);
 
     // collision tests
     const forwardCollisionTest = movementCollisionTest(
@@ -147,6 +185,30 @@ export const getAIInput = (
         playerRig,
         deceleration
     );
+    // reverse tests
+    /*
+    const reverseCollisionTest = movementCollisionTest(
+        reverseRadarImages,
+        keys,
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
+    */
+    const reverseLeftCollisionTest = movementCollisionTest(
+        reverseLeftRadarImages,
+        keys,
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
+    const reverseRightCollisionTest = movementCollisionTest(
+        reverseRightRadarImages,
+        keys,
+        gameObject.arena,
+        playerRig,
+        deceleration
+    );
     //console.log('collis f l r: ', forwardCollisionTest, turnLeftCollisionTest, turnRightCollisionTest);
 
     // check if in target
@@ -159,6 +221,9 @@ export const getAIInput = (
         let forwardValid: boolean = !forwardCollisionTest;
         let leftValid: boolean = !turnLeftCollisionTest;
         let rightValid: boolean = !turnRightCollisionTest;
+        //let reverseValid: boolean = !reverseCollisionTest;
+        let reverseLeftValid: boolean = !reverseLeftCollisionTest;
+        let reverseRightValid: boolean = !reverseRightCollisionTest;
         
         let distanceFromForward: number = distanceCheck(forwardRadarImages, aiRig.path);
         let distanceFromLeft: number = distanceCheck(turnLeftRadarImages, aiRig.path);
@@ -167,43 +232,57 @@ export const getAIInput = (
         // Check for the best direction based on collision tests and distances
         if (forwardValid) {
             bestDirection = 'forward';
+            //console.log('forward valid');
+            console.log('collis f l r: ', forwardCollisionTest, turnLeftCollisionTest, turnRightCollisionTest);
         }
         
-        if (leftValid && (distanceFromLeft < distanceFromForward || !forwardValid)) {
+        if (leftValid &&
+           // reverseLeftValid && 
+            (distanceFromLeft < distanceFromForward || !forwardValid)) {
             bestDirection = 'left';
+            //console.log('left valid');
         }
         
-        if (rightValid && 
+        else if (rightValid &&
+          //  reverseRightValid &&
             (distanceFromRight < distanceFromForward || (!forwardValid && !leftValid))) {
             bestDirection = 'right';
+            //console.log('right valid');
         }
         
         if (!forwardValid && !leftValid && !rightValid) {
             bestDirection = 'reverse'; // Default to reverse if no valid options
+            //console.log('reverse valid');
         }
 
         switch (bestDirection) {
             case 'left':
                 keys.ArrowLeft = true;
-                if ((aiRig.velocityX + aiRig.velocityY) < 0.2) {
+     //           if ((aiRig.velocityX + aiRig.velocityY) < 0.4) {
                     keys.ArrowUp = true;
-                }
+     //           }
                 break;
             case 'right':
                 keys.ArrowRight = true;
-                if ((aiRig.velocityX + aiRig.velocityY) < 0.2) {
+     //           if ((aiRig.velocityX + aiRig.velocityY) < 0.4) {
                     keys.ArrowUp = true;
-                }
+     //           }
                 break;
             case 'forward':
                 keys.ArrowUp = true;
                 break;
             case 'reverse':
                 keys.ArrowDown = true;
+                if (reverseLeftValid) {
+                    keys.ArrowLeft = true;
+                } else if (reverseRightValid) {
+                    keys.ArrowRight = true;
+                }
                 break;
             default: console.log('ai movement. bestCase not found');
         }
     }
+    //console.log('keys: ', keys);
     return keys;
 };
 
@@ -214,4 +293,4 @@ function distanceCheck(fromWhere: any, toWhere: any) {
 
     const c = Math.sqrt(a * a + b * b);
     return c;
-}  
+}

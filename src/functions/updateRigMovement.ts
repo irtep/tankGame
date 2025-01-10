@@ -32,8 +32,8 @@ export const updateRigMovement = (
     keys: { [key: string]: boolean },
     obstacles: Obstacle[],
     otherRig: Vehicle,
-    deceleration: number ) => {
-
+    deceleration: number
+) => {
     // Update movement based on input keys
     if (keys.ArrowUp || keys.w) {
         rig.velocityX += Math.cos(rig.angle) * rig.acceleration;
@@ -50,11 +50,7 @@ export const updateRigMovement = (
     }
 
     // Apply friction (deceleration)
-    if (!keys.ArrowUp &&
-        !keys.ArrowDown &&
-        !keys.w &&
-        !keys.s
-        ) {
+    if (!keys.ArrowUp && !keys.ArrowDown && !keys.w && !keys.s) {
         rig.velocityX *= 1 - deceleration;
         rig.velocityY *= 1 - deceleration;
     }
@@ -67,18 +63,84 @@ export const updateRigMovement = (
         rig.velocityY *= scale;
     }
 
-// Only change the angle if the new angle doesn't cause a collision
-if (keys.ArrowLeft || keys.a) {
-    if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
-        rig.angle -= 0.05;
+    // Attempt to rotate and handle collisions
+    let angleChange = 0;
+    if (keys.ArrowLeft || keys.a) {
+        angleChange = -0.05;
+    } else if (keys.ArrowRight || keys.d) {
+        angleChange = 0.05;
     }
-}
 
-if (keys.ArrowRight || keys.d) {
-    if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
-        rig.angle += 0.05;
+    if (angleChange !== 0) {
+        const proposedAngle = rig.angle + angleChange;
+
+        // Simulate rotation and check for collisions
+        const rotatedRig: Vehicle = {
+            ...rig,
+            angle: proposedAngle,
+        };
+
+        if (!checkForRotationCollision(rotatedRig, angleChange, obstacles, otherRig)) {
+            // No collision: allow the rotation
+            rig.angle = proposedAngle;
+        } else {
+            // Collision: simulate a forward push
+            const pushX = Math.cos(rig.angle) * 0.5; //0.2 Small push forward
+            const pushY = Math.sin(rig.angle) * 0.5;
+
+            const pushedRig: Vehicle = {
+                ...rig,
+                x: rig.x + pushX,
+                y: rig.y + pushY,
+            };
+
+            // Check if the pushed position is valid
+            if (
+                !obstacles.some((obstacle: Obstacle) =>
+                    isRotatedRectColliding(pushedRig, {
+                        x: obstacle.x + obstacle.width / 2,
+                        y: obstacle.y + obstacle.height / 2,
+                        width: obstacle.width,
+                        height: obstacle.height,
+                        angle: 0,
+                    })
+                ) &&
+                !isRotatedRectColliding(pushedRig, otherRig)
+            ) {
+                // Apply the forward push effect
+                rig.x = pushedRig.x;
+                rig.y = pushedRig.y;
+            } else {
+                // Simulate a backward push when forward is blocked
+                const backPushX = Math.cos(rig.angle) * -0.1; // Small push backward
+                const backPushY = Math.sin(rig.angle) * -0.1;
+
+                const backPushedRig: Vehicle = {
+                    ...rig,
+                    x: rig.x + backPushX,
+                    y: rig.y + backPushY,
+                };
+
+                // Check if the backward position is valid
+                if (
+                    !obstacles.some((obstacle: Obstacle) =>
+                        isRotatedRectColliding(backPushedRig, {
+                            x: obstacle.x + obstacle.width / 2,
+                            y: obstacle.y + obstacle.height / 2,
+                            width: obstacle.width,
+                            height: obstacle.height,
+                            angle: 0,
+                        })
+                    ) &&
+                    !isRotatedRectColliding(backPushedRig, otherRig)
+                ) {
+                    // Apply the backward push effect
+                    rig.x = backPushedRig.x;
+                    rig.y = backPushedRig.y;
+                }
+            }
+        }
     }
-}
 
     // Calculate the next position
     const nextRig: Vehicle = {
@@ -106,7 +168,7 @@ if (keys.ArrowRight || keys.d) {
         rig.velocityX = 0;
         rig.velocityY = 0;
     }
-}
+};
 
 export const returnMovementTest = (
     range: number,
@@ -114,12 +176,12 @@ export const returnMovementTest = (
     keys: { [key: string]: boolean },
     obstacles: Obstacle[],
     otherRig: Vehicle,
-    deceleration: number ): Vehicle => {
+    deceleration: number): Vehicle => {
 
     // Update movement based on input keys
     //if (keys.ArrowUp || keys.w) {
-        rig.velocityX += Math.cos(rig.angle) * range;
-        rig.velocityY += Math.sin(rig.angle) * range;
+    rig.velocityX += Math.cos(rig.angle) * range;
+    rig.velocityY += Math.sin(rig.angle) * range;
     //}
     /*
     if (keys.ArrowDown || keys.s) {
@@ -152,18 +214,18 @@ export const returnMovementTest = (
         rig.velocityY *= scale;
     }
     */
-// Only change the angle if the new angle doesn't cause a collision
-if (keys.ArrowLeft || keys.a) {
-//    if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
+    // Only change the angle if the new angle doesn't cause a collision
+    if (keys.ArrowLeft || keys.a) {
+        //    if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
         rig.angle -= 0.05;
-//    }
-}
+        //    }
+    }
 
-if (keys.ArrowRight || keys.d) {
- //   if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
+    if (keys.ArrowRight || keys.d) {
+        //   if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
         rig.angle += 0.05;
-//    }
-}
+        //    }
+    }
 
     // Calculate the next position
     const nextRig: Vehicle = {
@@ -241,17 +303,17 @@ export const movementCollisionTest = (
         rig.velocityY *= scale;
     }
     */
-if (keys.ArrowLeft || keys.a) {
- //   if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
+    if (keys.ArrowLeft || keys.a) {
+        //   if (!checkForRotationCollision(rig, -0.05, obstacles, otherRig)) {
         rig.angle -= 0.05;
- //   }
-}
+        //   }
+    }
 
-if (keys.ArrowRight || keys.d) {
- //   if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
+    if (keys.ArrowRight || keys.d) {
+        //   if (!checkForRotationCollision(rig, 0.05, obstacles, otherRig)) {
         rig.angle += 0.05;
- //   }
-}
+        //   }
+    }
 
     // Calculate the next position
     const nextRig: Vehicle = {
@@ -261,7 +323,7 @@ if (keys.ArrowRight || keys.d) {
     };
 
     // Check for collisions
-    
+
     if (
         !obstacles.some((obstacle: Obstacle) =>
             isRotatedRectColliding(nextRig, {
