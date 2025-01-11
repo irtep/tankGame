@@ -85,8 +85,8 @@ export const updateRigMovement = (
             rig.angle = proposedAngle;
         } else {
             // Collision: simulate a forward push
-            const pushX = Math.cos(rig.angle) * 0.5; //0.2 Small push forward
-            const pushY = Math.sin(rig.angle) * 0.5;
+            const pushX = Math.cos(rig.angle) * 3; // 1 Small push forward
+            const pushY = Math.sin(rig.angle) * 3;
 
             const pushedRig: Vehicle = {
                 ...rig,
@@ -112,8 +112,8 @@ export const updateRigMovement = (
                 rig.y = pushedRig.y;
             } else {
                 // Simulate a backward push when forward is blocked
-                const backPushX = Math.cos(rig.angle) * -0.1; // Small push backward
-                const backPushY = Math.sin(rig.angle) * -0.1;
+                const backPushX = Math.cos(rig.angle) * -3; // Small push backward
+                const backPushY = Math.sin(rig.angle) * -3;
 
                 const backPushedRig: Vehicle = {
                     ...rig,

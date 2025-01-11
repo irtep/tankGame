@@ -127,10 +127,13 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
     });
 
     // if ai rig, can enable this to check its next path
+    // if need to debug
+    /*
     if (vehicle.path.x !== 0) {
         ctx.strokeStyle = 'black';
         ctx.strokeRect(vehicle.path.x, vehicle.path.y, 60, 60);
     }
+    */
 }
 
 const drawTargetingX = (
@@ -186,7 +189,7 @@ const draw = (
     rigs: Vehicle[],
     hits: Hit[],
     bullets: Bullet[],
-    radars: Vehicle[],
+    radars: Vehicle[], // can be used in debug, if needed
     mouseNowX: number,
     mouseNowY: number
 ) => {
@@ -246,6 +249,7 @@ const draw = (
     // radar images for debug reasons, if needed
     // need to activate too from radarCheck that push
     //console.log('aiRig: ', rigs[1].x, rigs[1].y, rigs[1].angle);
+    /*
     radars.forEach((radarWave: Vehicle, i: number) => {
         //console.log('radarWave: ', radarWave.x, radarWave.y, radarWave.angle);
         ctx.save();
@@ -258,6 +262,7 @@ const draw = (
         ctx.fillText(JSON.stringify(i), radarWave.width / 2, radarWave.height / 2);        
         ctx.restore();
     });
+    */
 };
 
 
