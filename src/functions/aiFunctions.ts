@@ -233,7 +233,7 @@ export const getAIInput = (
         if (forwardValid) {
             bestDirection = 'forward';
             //console.log('forward valid');
-            console.log('collis f l r: ', forwardCollisionTest, turnLeftCollisionTest, turnRightCollisionTest);
+            //console.log('collis f l r: ', forwardCollisionTest, turnLeftCollisionTest, turnRightCollisionTest);
         }
         
         if (leftValid &&
