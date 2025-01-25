@@ -9,14 +9,14 @@ const Footer: React.FC = (): React.ReactElement => {
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundImage: "linear-gradient(to right, rgb(0,0,70), black, black)",
+        backgroundImage: "black",
         color: "red",
         borderRadius: 2,
         margin: 1,
         padding: 1
       }}>
         <Typography>
-          Version: Test: 0.2.0
+          Version: Test: 0.2.1
         </Typography>
       </Container>
     );

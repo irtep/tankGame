@@ -258,26 +258,28 @@ export const getAIInput = (
         switch (bestDirection) {
             case 'left':
                 keys.ArrowLeft = true;
-     //           if ((aiRig.velocityX + aiRig.velocityY) < 0.4) {
+                if ((Math.abs(aiRig.velocityX + aiRig.velocityY)) < 1) {
                     keys.ArrowUp = true;
-     //           }
+                }
                 break;
             case 'right':
                 keys.ArrowRight = true;
-     //           if ((aiRig.velocityX + aiRig.velocityY) < 0.4) {
+                if ((Math.abs(aiRig.velocityX + aiRig.velocityY)) < 1) {
                     keys.ArrowUp = true;
-     //           }
+                }
                 break;
             case 'forward':
                 keys.ArrowUp = true;
                 break;
             case 'reverse':
                 keys.ArrowDown = true;
+                /*
                 if (reverseLeftValid) {
                     keys.ArrowLeft = true;
                 } else if (reverseRightValid) {
                     keys.ArrowRight = true;
                 }
+                */
                 break;
             default: console.log('ai movement. bestCase not found');
         }

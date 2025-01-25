@@ -110,12 +110,14 @@ const drawVehicle = (ctx: CanvasRenderingContext2D, vehicle: Vehicle) => {
         ctx.restore();
     }
 
-    // texts rig
+    // texts of rig
     ctx.font = '14px Arial';
     ctx.fillStyle = 'cyan';
-    ctx.fillText(vehicle.name, vehicle.x, vehicle.y);
-    ctx.fillStyle = 'cyan';
-    ctx.fillText(JSON.stringify(vehicle.hitPoints), vehicle.x + 20, vehicle.y + 20);
+    ctx.fillText(vehicle.name, vehicle.x, vehicle.y - 10);
+    ctx.fillStyle = 'white';
+    ctx.fillText(`Damage: ${JSON.stringify(vehicle.maxHitPoints - vehicle.hitPoints)}`, vehicle.x + 20, vehicle.y + 10);
+    ctx.fillStyle = 'white';
+    ctx.fillText(`Momentum: ${JSON.stringify(Math.abs(Math.round(vehicle.velocityX + vehicle.velocityY)))}`, vehicle.x + 20, vehicle.y + 20);
     // guns
     vehicle.weapons.forEach((w: ArmedWeapon, i: number) => {
         if (w.cooldown === 0) {
