@@ -80,6 +80,7 @@ export interface Vehicle {
     armour: number;
     velocityX: number;
     velocityY: number;
+    maxHitPoints: number;
     hitPoints: number;
     desc?: string;
     battleImg?: string;

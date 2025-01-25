@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import draw from '../functions/draw';
 import { arenaHeight, arenaWidth, deceleration } from '../constants/measures';
-import { obstacles } from '../constants/obstacles';
-import { GameObject, MatchEndState, Vehicle } from '../interfaces/sharedInterfaces';
+import { generateRandomObstacles, obstacles } from '../constants/obstacles';
+import { GameObject, MatchEndState, Obstacle, Vehicle } from '../interfaces/sharedInterfaces';
 import { getRigByName, playSound } from '../functions/utils';
 import { isRotatedRectColliding } from '../functions/collisionDetect';
 import { shoot } from '../functions/fireWeapon';
