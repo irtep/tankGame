@@ -224,32 +224,30 @@ export const getAIInput = (
         //let reverseValid: boolean = !reverseCollisionTest;
         let reverseLeftValid: boolean = !reverseLeftCollisionTest;
         let reverseRightValid: boolean = !reverseRightCollisionTest;
-        
         let distanceFromForward: number = distanceCheck(forwardRadarImages, aiRig.path);
         let distanceFromLeft: number = distanceCheck(turnLeftRadarImages, aiRig.path);
         let distanceFromRight: number = distanceCheck(turnRightRadarImages, aiRig.path);
-        
         // Check for the best direction based on collision tests and distances
         if (forwardValid) {
             bestDirection = 'forward';
             //console.log('forward valid');
             //console.log('collis f l r: ', forwardCollisionTest, turnLeftCollisionTest, turnRightCollisionTest);
         }
-        
+
         if (leftValid &&
-           // reverseLeftValid && 
+            // reverseLeftValid && 
             (distanceFromLeft < distanceFromForward || !forwardValid)) {
             bestDirection = 'left';
             //console.log('left valid');
         }
-        
+
         else if (rightValid &&
-          //  reverseRightValid &&
+            //  reverseRightValid &&
             (distanceFromRight < distanceFromForward || (!forwardValid && !leftValid))) {
             bestDirection = 'right';
             //console.log('right valid');
         }
-        
+
         if (!forwardValid && !leftValid && !rightValid) {
             bestDirection = 'reverse'; // Default to reverse if no valid options
             //console.log('reverse valid');
